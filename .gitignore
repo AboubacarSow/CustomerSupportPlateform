@@ -1,0 +1,27 @@
+# Build outputs
+bin/
+bin/**
+obj/
+obj/**
+
+# User-specific files
+*.user
+*.suo
+*.cache
+*.log
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# Packages
+*.nupkg
+packages/
+
+# Environment files
+.env
+appsettings.Development.json
+
+# OS files
+.DS_Store
+Thumbs.db
