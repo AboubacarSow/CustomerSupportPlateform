@@ -8,8 +8,6 @@ public class DocumentChunk : BaseEntity
     public Guid DocumentId { get; set; }
     public KnowledgeDocument? Document { get; set; }
     public string Content { get; set; } = string.Empty;
-
-    [Column(TypeName = "vector(1536)")]
     public Vector? Embedding { get; set; }
 
 }

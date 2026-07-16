@@ -1,18 +1,14 @@
 namespace CustomerSupportPlateform.Domain.Entities;
 
-public class KnowledgeDocument
+public class KnowledgeDocument : BaseEntity
 {
-    public Guid Id { get; set; }
     public string Title { get; set; }= default!;
     public string? Description { get; set; }
     public string ContentType { get; set; }= default!;
-    public DateTime UploadedAt { get; set; }
     public string OriginalFileName { get; set; } = default!;
     public string StoragePath { get; set; } = default!;
     public IndexStatus Status { get; set; } = default!;
-    public DateTime IndexedAt { get; set; } = default!;
-
-    public List<DocumentChunk> Chunks { get; set; } = [];
+    public DateTime? IndexedAt { get; set; } = default!;
 }
 
 public enum IndexStatus
