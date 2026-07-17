@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         {
             options.AddHandlersFromAssemblies(typeof(AssemblyReference).Assembly);
             options.PublishStrategy = PublishStrategy.Parallel;
+
+            options.AddBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddConduitValidation(typeof(AssemblyReference).Assembly);
         return services;

@@ -1,3 +1,4 @@
+using Carter;
 using CustomerSupportPlateform.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapCarter();
 
 
 app.Run();

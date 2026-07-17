@@ -1,10 +1,10 @@
-using ConduitR.Abstractions;
-using CustomerSupportPlateform.Application.Interfaces;
+
 using Microsoft.AspNetCore.Http;
 
 namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Commands.UploadDocument;
 
-public record UploadDocumentCommand(IFormFile File, string Title, string Description): IRequest<Guid>;
+public record UploadDocumentCommand(string Title, string Description, IFormFile File) : 
+    IRequest<(Guid,string,string,IndexStatus)>;
 
 public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
 {
@@ -17,13 +17,12 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
             .WithMessage("File is required");
     }
 }
-public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, Guid>
+public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
-    public async ValueTask<Guid> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
+    public async ValueTask<(Guid, string, string, IndexStatus)> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
     {
         using var stream = new MemoryStream();
         await request.File.CopyToAsync(stream, cancellationToken);
-
         
       
         var (key,size,contentType) = await railwayStorageService.UploadAsync(stream,
@@ -33,10 +32,13 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicati
         var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
             request.File.FileName, contentType, key, size);
 
-         dbContext.Add<KnowledgeDocument>(knowledgeDocument);
+         dbContext.Add(knowledgeDocument);
          await dbContext.SaveChangesAsync(cancellationToken);
 
-        return knowledgeDocument.Id;
+        return (knowledgeDocument.Id,
+            knowledgeDocument.Title,
+            knowledgeDocument.Description! ,
+            knowledgeDocument.Status);
 
     }
 }
