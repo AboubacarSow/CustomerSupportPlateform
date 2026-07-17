@@ -1,4 +1,3 @@
-
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
@@ -22,43 +21,65 @@ internal class RailwayBucketStorage : IBlobStorage
     }
     public async Task DeleteAsync(string storageKey, CancellationToken cancellationToken = default)
     {
-        var deleteRequest = new DeleteObjectRequest
+        try
         {
-            BucketName = _bucketName,
-            Key = storageKey
-        };
-        await _s3Client.DeleteObjectAsync(deleteRequest, cancellationToken);
+            var deleteRequest = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = storageKey
+            };
+            await _s3Client.DeleteObjectAsync(deleteRequest, cancellationToken);
+        }
+        catch (AmazonS3Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while deleting object from S3");
+            throw;
+        }
     }
-
     public async Task<Stream> DownloadAsync(string storageKey, CancellationToken cancellationToken = default)
     {
-        var getRequest = new GetObjectRequest
+        try
         {
-            BucketName = _bucketName,
-            Key = storageKey
-        };
+            var getRequest = new GetObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = storageKey
+            };
 
-        var response = await _s3Client.GetObjectAsync(getRequest,cancellationToken);
+            var response = await _s3Client.GetObjectAsync(getRequest,cancellationToken);
+            return response.ResponseStream;
 
-
-        return response.ResponseStream;
-
+        }catch (AmazonS3Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while downloading object from S3");
+            throw;
+        }
+       
     }
 
-    public async Task<(string,long?,string)> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    public async Task<(string,long,string)> UploadAsync(Stream stream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
-        var key = $"{uploadFolder}/{fileName}";
-        var objectRequest = new PutObjectRequest
+        try
         {
-            BucketName = _bucketName,
-            ContentType = contentType,
-            InputStream = stream,
-            Key = key
-        };
+            var key = $"{uploadFolder}/{fileName}";
+            var objectRequest = new PutObjectRequest
+            {
+                BucketName = _bucketName,
+                ContentType = contentType,
+                InputStream = stream,
+                Key = key
+            };
 
-        var response = await _s3Client.PutObjectAsync(objectRequest, cancellationToken);
+            var response = await _s3Client.PutObjectAsync(objectRequest, cancellationToken);
 
-        return (response.ETag, response.Size,contentType);
+            return (key, stream.Length,contentType);
+        }
+        catch (AmazonS3Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while downloading object from S3");
+            throw;
+        }
+        
     }
 }
 
