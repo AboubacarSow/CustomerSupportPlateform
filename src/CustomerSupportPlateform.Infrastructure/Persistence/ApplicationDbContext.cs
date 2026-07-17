@@ -1,5 +1,3 @@
-
-
 namespace CustomerSupportPlateform.Infrastructure.Persistence;
 
 
