@@ -4,9 +4,9 @@
 namespace CustomerSupportPlateform.Infrastructure.Persistence;
 
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext
+internal class ApplicationDbContext : DbContext, IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    internal ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
 
@@ -36,10 +36,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         base.Remove<TEntity>(entity);
     }
 
-    public DbSet<ConversationMessage> ConversationMessages => Set<ConversationMessage>();
-    public DbSet<Session> Sessions => Set<Session>();
-    public DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
-    public DbSet<DocumentChunk> Chunks => Set<DocumentChunk>();
+    internal DbSet<ConversationMessage> ConversationMessages => Set<ConversationMessage>();
+    internal DbSet<Session> Sessions => Set<Session>();
+    internal DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
+    internal DbSet<DocumentChunk> Chunks => Set<DocumentChunk>();
 
     IQueryable<ConversationMessage> IApplicationDbContext.ConversationMessages => ConversationMessages;
     IQueryable<Session> IApplicationDbContext.Sessions => Sessions;
