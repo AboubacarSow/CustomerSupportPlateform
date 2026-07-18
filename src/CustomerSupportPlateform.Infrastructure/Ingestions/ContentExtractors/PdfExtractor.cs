@@ -1,0 +1,35 @@
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
+using System.Text;
+using UglyToad.PdfPig;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.ReadingOrderDetector;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
+
+namespace CustomerSupportPlateform.Infrastructure.ContentExtractors;
+
+internal class PdfExtractor : IContentExtractor
+{
+    public IngestionDocumentFormat Format => IngestionDocumentFormat.PDF;
+
+    public string ExtractContent(string tempPath)
+    {
+        using var pdfDocument = PdfDocument.Open(tempPath);
+        var stringBuilder = new StringBuilder();
+        var wordExtractor = NearestNeighbourWordExtractor.Instance;
+        var pageSegmentor = DocstrumBoundingBoxes.Instance;
+        var readingOrder = UnsupervisedReadingOrderDetector.Instance;
+        foreach(var page in pdfDocument.GetPages())
+        {
+            var letters = page.Letters;
+            var words = wordExtractor.GetWords(letters);
+            var textBlocks = pageSegmentor.GetBlocks(words);
+            var orderedTextBlocks = readingOrder.Get(textBlocks);
+
+            foreach(var block in orderedTextBlocks)
+            {
+                stringBuilder.Append(block.Text);
+            }
+        }
+        return stringBuilder.ToString();
+    }
+}
