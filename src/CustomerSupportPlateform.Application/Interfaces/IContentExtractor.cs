@@ -1,6 +1,8 @@
+
 namespace CustomerSupportPlateform.Application.Interfaces;
 
 public interface IContentExtractor
 {
-    string ExtractContent(Stream source);
+    IngestionDocumentFormat Format{get;}
+    string ExtractContent(string tempPath);
 }
