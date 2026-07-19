@@ -9,5 +9,7 @@ global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Routing;
 global using System.Net;
 global using CustomerSupportPlateform.Domain.Constants;
+global using CustomerSupportPlateform.Domain.Events;
+
 
 

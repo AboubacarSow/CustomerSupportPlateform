@@ -1,7 +1,4 @@
 
-using Microsoft.AspNetCore.Http;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Commands.UploadDocument;
 
@@ -19,7 +16,8 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
             .WithMessage("File is required");
     }
 }
-public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
+public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStorageService tmpStorage,
+    IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
     private readonly string path = Path.Combine(Environment.CurrentDirectory, "data/tmp");
 
@@ -35,12 +33,14 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicati
 
 
         //Save file in tmp folder which behaves as buffer while ingestion
-        await StoreIntoTempFolder(request.File,key);
+        var tmpPath = await tmpStorage.UploadFileToTempAsync(request.File);
         var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
             request.File.FileName, contentType, key, size);
 
          dbContext.Add(knowledgeDocument);
+         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,tmpPath));
          await dbContext.SaveChangesAsync(cancellationToken);
+         
 
         return (knowledgeDocument.Id,
             knowledgeDocument.Title,
@@ -49,10 +49,5 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,IApplicati
 
     }
 
-    private async Task StoreIntoTempFolder(IFormFile file, string key)
-    {
-        var fullPath = Path.Combine(path, key);
-        using var stream = File.OpenWrite(fullPath);
-        await file.CopyToAsync(stream);
-    }
+  
 }

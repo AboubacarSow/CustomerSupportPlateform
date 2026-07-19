@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
             var endpoint = configuration["Ollama:Endpoint"];
             ArgumentException.ThrowIfNullOrEmpty(endpoint);
             client.BaseAddress = new Uri(endpoint);
+            client.Timeout = TimeSpan.FromSeconds(1);
         });
 
         services.AddDbContext<ApplicationDbContext>(options =>

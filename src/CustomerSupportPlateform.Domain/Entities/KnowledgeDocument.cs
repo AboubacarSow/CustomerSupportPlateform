@@ -1,6 +1,8 @@
+using CustomerSupportPlateform.Domain.DDD;
+
 namespace CustomerSupportPlateform.Domain.Entities;
 
-public class KnowledgeDocument : BaseEntity
+public class KnowledgeDocument : BaseEntity, IHasDomainEvent
 {
     public string Title { get; set; }= default!;
     public string? Description { get; set; }
@@ -11,7 +13,7 @@ public class KnowledgeDocument : BaseEntity
     public IndexStatus Status { get; set; } = default!;
     public DateTime? IndexedAt { get; set; } = default!;
 
-
+    
     private KnowledgeDocument(string title, string? description, 
         string contentType, string originalFileName, 
         string storagePath, long fileSize,IndexStatus status)
@@ -44,6 +46,23 @@ public class KnowledgeDocument : BaseEntity
             new (title, description, contentType, fileName, path, size, IndexStatus.Pending) :
             new (title, contentType, fileName, path, size, IndexStatus.Pending);
     }
+
+
+    #region Domain Driven Design
+    private List<IDomainEvent> _domains = [];
+    [NotMapped]
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domains.AsReadOnly();
+
+    public void RaiseDomainEvent(IDomainEvent domainEvent)
+    {
+        _domains.Add(domainEvent);
+    }
+    public void ClearDomainEvents()
+    {
+        _domains.Clear();
+    }
+    #endregion 
+    
 }
 
 public enum IndexStatus

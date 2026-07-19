@@ -8,5 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
+    <PackageReference Include="ConduitR" Version="1.0.5" />
+    <PackageReference Include="ConduitR.DependencyInjection" Version="1.0.5" />
 	</ItemGroup>
 </Project>

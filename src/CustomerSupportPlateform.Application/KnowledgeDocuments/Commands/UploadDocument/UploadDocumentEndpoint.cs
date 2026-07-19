@@ -11,7 +11,8 @@ public class UploadDocumentEndpoint : ICarterModule
     {
         app.MapPost("/api/knowledges", async (IMediator sender,UploadDocumentRequest request) =>
         {
-            var (id,title,description,status) = await sender.Send(new UploadDocumentCommand(request.Title,
+            var (id,title,description,status) = await sender.Send(new UploadDocumentCommand
+                                                                        (request.Title,
                                                                         request.Description,
                                                                         request.File));
             //return Results.CreatedAtRoute("/api/knowledges/", new { id });
