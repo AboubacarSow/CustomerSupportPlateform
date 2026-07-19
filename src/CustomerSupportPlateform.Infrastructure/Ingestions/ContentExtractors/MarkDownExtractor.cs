@@ -3,7 +3,7 @@ using Markdig.Syntax;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace CustomerSupportPlateform.Infrastructure.ContentExtractors;
+namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class MarkDownExtractor : IContentExtractor
 {

@@ -5,7 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
-builder.Services.AddDependencies(builder.Configuration);   
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDependencies(builder.Configuration); 
+
 
 var app = builder.Build();
 

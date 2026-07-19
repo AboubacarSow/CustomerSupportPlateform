@@ -4,7 +4,7 @@ namespace CustomerSupportPlateform.Infrastructure.Embeddings;
 
 internal class OpenAiEmbeddingGenerator : IEmbeddingGenerator
 {
-    public Vector GenerateEmbedding(string chunck)
+    public Task<Vector> GenerateEmbedding(string chunck)
     {
         throw new NotImplementedException();
     }

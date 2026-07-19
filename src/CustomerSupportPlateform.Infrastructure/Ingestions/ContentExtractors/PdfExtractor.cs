@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using System.Text;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.ReadingOrderDetector;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 
-namespace CustomerSupportPlateform.Infrastructure.ContentExtractors;
+namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class PdfExtractor : IContentExtractor
 {

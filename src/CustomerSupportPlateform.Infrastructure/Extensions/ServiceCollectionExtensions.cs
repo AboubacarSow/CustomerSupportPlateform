@@ -1,5 +1,5 @@
-using CustomerSupportPlateform.Infrastructure.ContentExtractors;
 using CustomerSupportPlateform.Infrastructure.Embeddings;
+using CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 using CustomerSupportPlateform.Infrastructure.Persistence;
 using CustomerSupportPlateform.Infrastructure.Storage;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +20,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IContentExtractor, PdfExtractor>();
         services.AddScoped<IContentExtractor, DocxExtractor>();
         services.AddScoped<IContentExtractor, MarkDownExtractor>();
+
+        services.AddHttpClient("Ollama-Client", client =>
+        {
+            var endpoint = configuration["Ollama:Endpoint"];
+            ArgumentException.ThrowIfNullOrEmpty(endpoint);
+            client.BaseAddress = new Uri(endpoint);
+        });
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
