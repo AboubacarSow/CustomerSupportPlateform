@@ -7,8 +7,11 @@ namespace CustomerSupportPlateform.Infrastructure.Embeddings;
 internal class OllamaEmbeddingGenerator(IHttpClientFactory factory, 
     IConfiguration configuration) : IEmbeddingGenerator
 {
+    
     private readonly HttpClient _client = factory.CreateClient("Ollama-Client");
     private readonly IConfiguration _configuration = configuration;
+
+    public ModelsEnvironment Environment => ModelsEnvironment.Developpement;
 
     public async Task<Vector> GenerateEmbedding(string chunk)
     {
@@ -17,7 +20,7 @@ internal class OllamaEmbeddingGenerator(IHttpClientFactory factory,
             model = _configuration["Ollama:EmbeddingModel"],
             input = chunk
         };
-        var result = await _client.PostAsJsonAsync("/api/embed", request);
+        var result = await _client.PostAsJsonAsync("/api/embed", request); 
         if (!result.IsSuccessStatusCode)
         {
             var error = await result.Content.ReadAsStringAsync();

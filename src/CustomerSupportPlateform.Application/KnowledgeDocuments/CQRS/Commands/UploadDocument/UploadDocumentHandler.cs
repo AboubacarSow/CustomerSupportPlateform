@@ -29,7 +29,8 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStora
       
         var (key,size,contentType) = await railwayStorageService.UploadAsync(stream,
                                     request.File.FileName,
-                                    request.File.ContentType,cancellationToken);
+                                    request.File.ContentType,
+                                    cancellationToken);
 
 
         //Save file in tmp folder which behaves as buffer while ingestion
@@ -38,7 +39,7 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStora
             request.File.FileName, contentType, key, size);
 
          dbContext.Add(knowledgeDocument);
-         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,tmpPath));
+         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,IngestionDocumentFormat.PDF,tmpPath));
          await dbContext.SaveChangesAsync(cancellationToken);
          
 

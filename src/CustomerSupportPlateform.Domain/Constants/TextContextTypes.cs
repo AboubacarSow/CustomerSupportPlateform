@@ -6,9 +6,3 @@ public static class TextContextTypes
     public const string MD = "application/md";
     public const string TEXT = "application/text";
 }
-public enum IngestionDocumentFormat{
-    PDF,
-    DOCX,
-    MD,
-    TXT
-}

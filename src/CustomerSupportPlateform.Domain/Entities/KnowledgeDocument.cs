@@ -49,10 +49,9 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
 
 
     #region Domain Driven Design
-    private List<IDomainEvent> _domains = [];
+    private readonly List<IDomainEvent> _domains = [];
     [NotMapped]
     public IReadOnlyList<IDomainEvent> DomainEvents => _domains.AsReadOnly();
-
     public void RaiseDomainEvent(IDomainEvent domainEvent)
     {
         _domains.Add(domainEvent);
@@ -62,7 +61,6 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
         _domains.Clear();
     }
     #endregion 
-    
 }
 
 public enum IndexStatus
