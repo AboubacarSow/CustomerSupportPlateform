@@ -1,4 +1,5 @@
 using System.Text;
+using DocumentFormat.OpenXml.Drawing;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.ReadingOrderDetector;
@@ -8,7 +9,7 @@ namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class PdfExtractor : IContentExtractor
 {
-    public IngestionDocumentFormat Format => IngestionDocumentFormat.PDF;
+    public string Format => TextContentTypes.PDF;
 
     public string ExtractContent(string tempPath)
     {
@@ -32,3 +33,5 @@ internal class PdfExtractor : IContentExtractor
         return stringBuilder.ToString();
     }
 }
+
+

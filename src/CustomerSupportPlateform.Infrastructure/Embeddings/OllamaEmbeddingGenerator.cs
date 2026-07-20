@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using Pgvector;
-using System.Net.Http.Json;
+
 
 namespace CustomerSupportPlateform.Infrastructure.Embeddings;
 
@@ -11,27 +9,41 @@ internal class OllamaEmbeddingGenerator(IHttpClientFactory factory,
     private readonly HttpClient _client = factory.CreateClient("Ollama-Client");
     private readonly IConfiguration _configuration = configuration;
 
-    public ModelsEnvironment Environment => ModelsEnvironment.Developpement;
+    public ModelsEnvironment Environment => ModelsEnvironment.Development;
 
-    public async Task<Vector> GenerateEmbedding(string chunk)
+    public async Task<Vector> GenerateEmbeddingAsync(string chunk)
     {
-        var request = new
-        {
-            model = _configuration["Ollama:EmbeddingModel"],
-            input = chunk
-        };
-        var result = await _client.PostAsJsonAsync("/api/embed", request); 
-        if (!result.IsSuccessStatusCode)
-        {
-            var error = await result.Content.ReadAsStringAsync();
-            throw new HttpRequestException(error);
-        } 
-        var response = await result.Content.ReadFromJsonAsync<OllamaEmbedResponse>();
-        var vector = new Vector(response!.Embedding);
+        var request = new OllamaEmbedRequest
+        (
+            _configuration["Ollama:EmbeddingModel"]!,
+            chunk
+        );
+        var response = await _client.PostAsJsonAsync("/api/embed", request); 
+        response.EnsureSuccessStatusCode();         
+        var result = await response.Content.ReadFromJsonAsync<OllamaEmbedResponse>();
+        var vector = new Vector(result!.Embedding);
 
         return vector;
     }
 }
 
-internal record OllamaEmbedResponse(float[] Embedding);
-internal record OllamaEmbedRequest(string Model, string Prompt);
+internal class OllamaEmbedResponse
+{
+    [JsonPropertyName("embedding")] internal float[] Embedding { get; init; }
+    internal OllamaEmbedResponse(float[] embedding)
+    {
+        Embedding = embedding;
+    }
+}
+
+internal class OllamaEmbedRequest
+{
+     [JsonPropertyName("model")] internal string Model { get; init; } = default!;
+     [JsonPropertyName("input")] internal string Input { get; init; } = default!;
+
+    internal OllamaEmbedRequest(string model, string input)
+    {
+        Model = model;
+        Input = input;
+    }
+}

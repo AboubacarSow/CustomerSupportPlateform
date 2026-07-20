@@ -7,7 +7,7 @@ namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class MarkDownExtractor : IContentExtractor
 {
-    public IngestionDocumentFormat Format => IngestionDocumentFormat.MD;
+    public string Format => TextContentTypes.MD;
     public string ExtractContent(string tempPath)
     {
         if(File.Exists(tempPath))

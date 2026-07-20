@@ -39,7 +39,7 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStora
             request.File.FileName, contentType, key, size);
 
          dbContext.Add(knowledgeDocument);
-         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,IngestionDocumentFormat.PDF,tmpPath));
+         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,contentType,tmpPath));
          await dbContext.SaveChangesAsync(cancellationToken);
          
 

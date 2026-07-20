@@ -4,3 +4,4 @@ public interface IDocumentIndexer
 {
     bool IndexDocument(string key);
 }
+

@@ -46,7 +46,17 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
             new (title, description, contentType, fileName, path, size, IndexStatus.Pending) :
             new (title, contentType, fileName, path, size, IndexStatus.Pending);
     }
+    
+    public void MarkAsIndexed()
+    {
+        Status = IndexStatus.Indexed;
+        IndexedAt = DateTime.UtcNow;
+    }
 
+    public void MarkAsIndexing()
+    {
+        Status = IndexStatus.Indexing;
+    }
 
     #region Domain Driven Design
     private readonly List<IDomainEvent> _domains = [];

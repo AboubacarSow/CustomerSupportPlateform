@@ -5,7 +5,7 @@ namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class DocxExtractor : IContentExtractor
 {
-    public IngestionDocumentFormat Format => IngestionDocumentFormat.DOCX;
+    public string Format => TextContentTypes.DOCX;
     public string ExtractContent(string tempPath)
     {
         //var stringBuilder = new StringBuilder();
