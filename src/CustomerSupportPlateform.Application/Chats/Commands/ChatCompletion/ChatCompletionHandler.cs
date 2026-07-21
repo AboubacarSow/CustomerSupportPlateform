@@ -3,8 +3,19 @@ using CustomerSupportPlateform.Application.Chats.Dtos;
 namespace CustomerSupportPlateform.Application.Chats.Commands.ChatCompletion;
 
 
-public record ChatCompletionCommand(string Question): IRequest<Dtos.ChatResponseDto>;
+public record ChatCompletionCommand(Guid SessionId,string Question): IRequest<Dtos.ChatResponseDto>;
 
+public class ChatCompletionCommandValidator: AbstractValidator<ChatCompletionCommand>
+{
+    public ChatCompletionCommandValidator(){
+        RuleFor(c => c.SessionId)
+            .NotNull()
+            .NotEmpty()
+            .WithMessage("SessionId is required");
+        RuleFor(c => c.Question).NotEmpty()
+            .WithMessage("Question cannot be empty");
+    }
+}
 public class ChatCompletionHandler(IChatCompletion chatHandler,IEmbeddingGenerator generator,
 IVectorSearchSimilarity vectorSearch) : IRequestHandler<ChatCompletionCommand, ChatResponseDto>
 {
@@ -12,7 +23,7 @@ IVectorSearchSimilarity vectorSearch) : IRequestHandler<ChatCompletionCommand, C
     {
         var embedding = await generator.GenerateEmbeddingAsync(request.Question);
         var context = await vectorSearch.SearchAsync(embedding);
-        var message = await chatHandler.RequestAsync(context, request.Question);
+        var message = await chatHandler.RequestAsync(request.SessionId,context, request.Question);
         return new(message);
     }
 }
