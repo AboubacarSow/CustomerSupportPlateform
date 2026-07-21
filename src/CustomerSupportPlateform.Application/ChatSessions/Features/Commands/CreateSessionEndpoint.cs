@@ -1,4 +1,4 @@
-namespace CustomerSupportPlateform.Application.ChatSessions.Commands;
+namespace CustomerSupportPlateform.Application.ChatSessions.Features.Commands;
 
 public record CreateSessionRequest(Guid Id);
 public class CreateSessionEndpoint : ICarterModule

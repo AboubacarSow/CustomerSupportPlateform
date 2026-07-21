@@ -1,6 +1,6 @@
-using CustomerSupportPlateform.Application.ChatSessions.Dtos;
+using CustomerSupportPlateform.Application.ChatSessions.Features.Dtos;
 
-namespace CustomerSupportPlateform.Application.ChatSessions.Commands;
+namespace CustomerSupportPlateform.Application.ChatSessions.Features.Commands;
 
 public record CreateSessionCommand(Guid? Id): IRequest<SessionDto>;
 

@@ -1,6 +1,6 @@
-using CustomerSupportPlateform.Application.Chats.Dtos;
+using CustomerSupportPlateform.Application.Chats.Features.Dtos;
 
-namespace CustomerSupportPlateform.Application.Chats.Commands.ChatCompletion;
+namespace CustomerSupportPlateform.Application.Chats.Features.Commands.ChatCompletion;
 
 
 public record ChatCompletionCommand(Guid SessionId,string Question): IRequest<Dtos.ChatResponseDto>;

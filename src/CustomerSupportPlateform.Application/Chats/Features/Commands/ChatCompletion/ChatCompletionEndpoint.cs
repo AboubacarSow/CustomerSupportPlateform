@@ -1,4 +1,4 @@
-namespace CustomerSupportPlateform.Application.Chats.Commands.ChatCompletion;
+namespace CustomerSupportPlateform.Application.Chats.Features.Commands.ChatCompletion;
 
 
 public record ChatCompletionRequest(Guid SessionId,string Question);

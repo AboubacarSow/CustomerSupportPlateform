@@ -1,6 +1,4 @@
-
-
-namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Commands.UploadDocument;
+namespace CustomerSupportPlateform.Application.KnowledgeDocuments.CQRS.Commands.UploadDocument;
 
 public record UploadDocumentCommand(string Title, string Description, IFormFile File) : 
     IRequest<(Guid,string,string,IndexStatus)>;
@@ -19,8 +17,6 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
 public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStorageService tmpStorage,
     IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
-    private readonly string path = Path.Combine(Environment.CurrentDirectory, "data/tmp");
-
     public async ValueTask<(Guid, string, string, IndexStatus)> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
     {
         using var stream = new MemoryStream();
