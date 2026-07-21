@@ -1,3 +1,4 @@
+using Amazon.S3;
 using CustomerSupportPlateform.Infrastructure.ChatCompletions;
 using CustomerSupportPlateform.Infrastructure.Embeddings;
 using CustomerSupportPlateform.Infrastructure.Ingestions;
@@ -5,6 +6,7 @@ using CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 using CustomerSupportPlateform.Infrastructure.Persistence;
 using CustomerSupportPlateform.Infrastructure.PromptPreparation;
 using CustomerSupportPlateform.Infrastructure.Storage;
+using CustomerSupportPlateform.Infrastructure.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,18 +17,25 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services,
     IConfiguration configuration)
     {
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IApplicationDbContext>(serviceProvicer =>
+            serviceProvicer.GetRequiredService<ApplicationDbContext>()
+        );
         services.AddScoped<IBlobStorage, RailwayBucketStorage>();
-        services.AddScoped<ITempStorageService,ITempStorageService>();
-        services.AddScoped<IEmbeddingGenerator,OpenAiEmbeddingGenerator>();
+        services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+        services.AddAWSService<IAmazonS3>();
+        services.AddScoped<ITempStorageService,TempStorageService>();
+        services.AddTransient<IEmbeddingGenerator,OpenAiEmbeddingGenerator>();
+        services.AddTransient<IEmbeddingGenerator,OllamaEmbeddingGenerator>();
         services.AddScoped<IContentCleaner,ContentCleaner>();
+        services.AddScoped<IContentChunker,ContentChunker>();
         services.AddScoped<IVectorSearchSimilarity, VectorSearchSimilarity>();
 
-        services.AddScoped<IContentExtractor, PdfExtractor>();
-        services.AddScoped<IContentExtractor, DocxExtractor>();
-        services.AddScoped<IContentExtractor, MarkDownExtractor>();
+        services.AddTransient<IContentExtractor, PdfExtractor>();
+        services.AddTransient<IContentExtractor, DocxExtractor>();
+        services.AddTransient<IContentExtractor, MarkDownExtractor>();
 
-        services.AddScoped<IChatCompletion,OllamaChatCompletion>();
+        services.AddTransient<IChatCompletion,OllamaChatCompletion>();
+        services.AddTransient<IChatCompletion,OpenAiChatCompletion>();
 
         services.AddHttpClient("Ollama-Client", client =>
         {

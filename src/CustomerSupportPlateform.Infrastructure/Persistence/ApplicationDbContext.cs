@@ -6,7 +6,7 @@ namespace CustomerSupportPlateform.Infrastructure.Persistence;
 
 internal class ApplicationDbContext : DbContext, IApplicationDbContext
 {
-    internal ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
 

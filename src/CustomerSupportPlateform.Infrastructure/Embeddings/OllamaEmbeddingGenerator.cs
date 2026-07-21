@@ -2,15 +2,20 @@
 
 namespace CustomerSupportPlateform.Infrastructure.Embeddings;
 
-internal class OllamaEmbeddingGenerator(IHttpClientFactory factory, 
-    IConfiguration configuration) : IEmbeddingGenerator
+internal class OllamaEmbeddingGenerator : IEmbeddingGenerator
 {
     
-    private readonly HttpClient _client = factory.CreateClient("Ollama-Client");
-    private readonly IConfiguration _configuration = configuration;
+    private readonly HttpClient _client ;
+    private readonly IConfiguration _configuration ;
 
     public ModelsEnvironment Environment => ModelsEnvironment.Development;
 
+    public OllamaEmbeddingGenerator(IHttpClientFactory factory,
+    IConfiguration configuration)
+    {
+        _client = factory.CreateClient("Ollama-Client");
+        _configuration = configuration;
+    }
     public async Task<Vector> GenerateEmbeddingAsync(string chunk)
     {
         var request = new OllamaEmbedRequest

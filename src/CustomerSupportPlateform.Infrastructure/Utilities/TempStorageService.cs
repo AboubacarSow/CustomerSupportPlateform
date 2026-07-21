@@ -7,7 +7,7 @@ internal class TempStorageService : ITempStorageService
 {
     private readonly string folder = "data/tmp";
 
-    internal TempStorageService()
+    public TempStorageService()
     {
         if (!File.Exists(folder))
         {

@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 namespace CustomerSupportPlateform.Application.KnowledgeDocuments.EventHandlers;
 
 
-public class KnowledgeDocumentCreatedEventHandler(List<IEmbeddingGenerator> embeddingGenerators,
-    List<IContentExtractor> contentExtractors,IContentChunker chunker,
+public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerator> embeddingGenerators,
+    IEnumerable<IContentExtractor> contentExtractors,IContentChunker chunker,
     IApplicationDbContext dbContext) : INotificationHandler<KnowledgeDocumentCreatedEvent>
 {
-    private readonly List<IEmbeddingGenerator> _embeddingGenerators = embeddingGenerators;
-    private readonly List<IContentExtractor> _contentExtractors = contentExtractors;
+    private readonly IEnumerable<IEmbeddingGenerator> _embeddingGenerators = embeddingGenerators;
+    private readonly IEnumerable<IContentExtractor> _contentExtractors = contentExtractors;
     private readonly IContentChunker _chunker =chunker;
     private readonly IApplicationDbContext _dbContext = dbContext;
 

@@ -8,7 +8,7 @@ internal class OllamaChatCompletion : IChatCompletion
     public ModelsEnvironment Environment => ModelsEnvironment.Development;
     private readonly IApplicationDbContext _dbContext;
 
-    internal OllamaChatCompletion(IHttpClientFactory factory, IConfiguration configuration,IApplicationDbContext dbContext)
+    public OllamaChatCompletion(IHttpClientFactory factory, IConfiguration configuration,IApplicationDbContext dbContext)
     {
         _client = factory.CreateClient("Ollama-Client");
         _configuration = configuration;
