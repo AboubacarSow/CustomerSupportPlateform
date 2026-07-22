@@ -1,5 +1,6 @@
 using Carter;
 using CustomerSupportPlateform.API.Extensions;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDependencies(builder.Configuration); 
 
+//builder.Services.AddAntiforgery();
+
 
 var app = builder.Build();
 
@@ -15,8 +18,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-}
 
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "Customer Support Plateform API";
+    });
+}
+//app.UseAntiforgery();
 app.UseHttpsRedirection();
 
 app.MapCarter();

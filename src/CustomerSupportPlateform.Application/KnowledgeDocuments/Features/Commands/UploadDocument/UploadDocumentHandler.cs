@@ -1,4 +1,4 @@
-namespace CustomerSupportPlateform.Application.KnowledgeDocuments.CQRS.Commands.UploadDocument;
+namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Features.Commands.UploadDocument;
 
 public record UploadDocumentCommand(string Title, string Description, IFormFile File) : 
     IRequest<(Guid,string,string,IndexStatus)>;
