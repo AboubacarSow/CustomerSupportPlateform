@@ -9,6 +9,6 @@ public class DocumentMapper
         document.ContentType,
         document.OriginalFileName,
         document.FileSize,
-        document.Status,
+        document.Status.ToString(),
         document.IndexedAt);
 }

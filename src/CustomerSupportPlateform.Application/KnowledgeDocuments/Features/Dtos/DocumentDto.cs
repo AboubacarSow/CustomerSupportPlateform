@@ -6,6 +6,6 @@ public record DocumentDto(Guid Id,
                         string ContentType,
                         string OriginalFileName,
                         long FileSize,
-                        IndexStatus Status,
+                        string Status,
                         DateTimeOffset?  IndexedAt
                         );

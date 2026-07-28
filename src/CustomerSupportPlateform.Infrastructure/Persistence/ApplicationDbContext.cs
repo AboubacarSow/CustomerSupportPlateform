@@ -41,6 +41,8 @@ internal class ApplicationDbContext : DbContext, IApplicationDbContext
     internal DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
     internal DbSet<DocumentChunk> Chunks => Set<DocumentChunk>();
 
+    internal DbSet<OutBoxMessage> OutBoxMessages => Set<OutBoxMessage>();
+
     IQueryable<ConversationMessage> IApplicationDbContext.ConversationMessages => ConversationMessages;
     IQueryable<Session> IApplicationDbContext.Sessions => Sessions;
     IQueryable<KnowledgeDocument> IApplicationDbContext.KnowledgeDocuments => KnowledgeDocuments;

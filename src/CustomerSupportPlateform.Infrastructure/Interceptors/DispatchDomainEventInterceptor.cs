@@ -1,7 +1,9 @@
 using ConduitR.Abstractions;
 using CustomerSupportPlateform.Domain.DDD;
+using CustomerSupportPlateform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace CustomerSupportPlateform.Infrastructure.Interceptors;
 
@@ -9,11 +11,12 @@ public class DispatchDomainEventInterceptor(IServiceScopeFactory serviceScopeFac
 {
     private readonly IServiceScopeFactory _scopeFactory = serviceScopeFactory;
 
-    // Because I want document being saved before my eventhandler starts its work
-    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+ 
+
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
-        await DispatchDomainEvent(eventData.Context, cancellationToken) ;
-        return await base.SavedChangesAsync(eventData, result, cancellationToken);
+        await DispatchDomainEvent(eventData.Context, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
     
     private  async Task DispatchDomainEvent(DbContext? context,CancellationToken cancellationToken=default)
@@ -36,7 +39,13 @@ public class DispatchDomainEventInterceptor(IServiceScopeFactory serviceScopeFac
 
         foreach(var raisedevent in events)
         {
-            await mediator.Publish((dynamic)raisedevent,cancellationToken);
+            var outBoxMessage = new OutBoxMessage(
+                payload:JsonSerializer.Serialize(raisedevent,raisedevent.GetType()),
+                eventType:raisedevent.GetType().AssemblyQualifiedName!);
+            
+
+            await context.Set<OutBoxMessage>().AddAsync(outBoxMessage,cancellationToken);
         }
+
     }
 }

@@ -1,4 +1,6 @@
 using CustomerSupportPlateform.Application.Chats.Features.Dtos;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace CustomerSupportPlateform.Application.Chats.Features.Commands.ChatCompletion;
 
@@ -16,14 +18,22 @@ public class ChatCompletionCommandValidator: AbstractValidator<ChatCompletionCom
             .WithMessage("Question cannot be empty");
     }
 }
-public class ChatCompletionHandler(IChatCompletion chatHandler,IEmbeddingGenerator generator,
-IVectorSearchSimilarity vectorSearch) : IRequestHandler<ChatCompletionCommand, ChatResponseDto>
+public class ChatCompletionHandler(IEnumerable<IChatCompletion> chatHandlers,IEmbeddingGenerator generator,
+IVectorSearchSimilarity vectorSearch, ILogger<ChatCompletionHandler> logger) : IRequestHandler<ChatCompletionCommand, ChatResponseDto>
 {
     public async ValueTask<ChatResponseDto> Handle(ChatCompletionCommand request, CancellationToken cancellationToken)
     {
+        var stopWatch = Stopwatch.StartNew();
         var embedding = await generator.GenerateEmbeddingAsync(request.Question);
+        logger.LogInformation("Embedding Elapsed:{Elapsed} ms",stopWatch.ElapsedMilliseconds);
+        stopWatch.Restart();
         var context = await vectorSearch.SearchAsync(embedding);
-        var message = await chatHandler.RequestAsync(request.SessionId,context, request.Question);
+        logger.LogInformation("Vector search Elapsed:{Elapsed} ms", stopWatch.ElapsedMilliseconds);
+        stopWatch.Restart();
+        var ollamaChatHandler = chatHandlers.FirstOrDefault(h => h.Environment == ModelsEnvironment.Development);
+        var message = await ollamaChatHandler.RequestAsync(request.SessionId,context, request.Question);
+        logger.LogInformation("Chat Response Elapsed:{Elapsed} ms", stopWatch.ElapsedMilliseconds);
+
         return new(message);
     }
 }

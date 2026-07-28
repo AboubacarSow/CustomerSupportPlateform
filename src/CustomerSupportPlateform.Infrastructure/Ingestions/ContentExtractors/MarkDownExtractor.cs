@@ -1,6 +1,6 @@
 using Markdig;
 using Markdig.Syntax;
-using System.Collections.Immutable;
+using Markdig.Syntax.Inlines;
 using System.Text;
 
 namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
@@ -20,12 +20,16 @@ internal class MarkDownExtractor : IContentExtractor
 
         var allParagraphs = document.Descendants<ParagraphBlock>().ToArray();
 
-        var content = allParagraphs.Select(x => x.Inline!.FirstChild)
-            .Cast<Markdig.Syntax.Inlines.LiteralInline>()
-            .Select(x => x.Content).ToArray();
-
-        foreach (var slice in content)
-            stringBuilder.Append(slice.Text);
+        foreach( var block in allParagraphs)
+        {
+            if (block.Inline == null) continue;
+            foreach (var inline in block.Inline.Descendants<LiteralInline>())
+            {
+                stringBuilder.Append(inline.Content);
+            }
+                
+        }
+        
 
         return stringBuilder.ToString();
 

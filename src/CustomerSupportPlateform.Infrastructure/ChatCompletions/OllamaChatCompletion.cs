@@ -1,3 +1,7 @@
+using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
 namespace CustomerSupportPlateform.Infrastructure.ChatCompletions;
 
 
@@ -7,12 +11,15 @@ internal class OllamaChatCompletion : IChatCompletion
     private readonly IConfiguration _configuration;
     public ModelsEnvironment Environment => ModelsEnvironment.Development;
     private readonly IApplicationDbContext _dbContext;
+    private readonly ILogger<OllamaChatCompletion> _logger;
 
-    public OllamaChatCompletion(IHttpClientFactory factory, IConfiguration configuration,IApplicationDbContext dbContext)
+    public OllamaChatCompletion(IHttpClientFactory factory,ILogger<OllamaChatCompletion> logger,
+        IConfiguration configuration,IApplicationDbContext dbContext)
     {
         _client = factory.CreateClient("Ollama-Client");
         _configuration = configuration;
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public async Task<string> RequestAsync(Guid sessionId, List<string> context, string question)
@@ -56,25 +63,31 @@ internal class OllamaChatCompletion : IChatCompletion
             [..requestMessages]
             );
         var response = await _client.PostAsJsonAsync("api/chat",request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            _logger.LogWarning("ChatCompletion request Failed:{Message}", body);
+            throw new HttpRequestException("Failed to chat");
+        }
         response.EnsureSuccessStatusCode();
      
         var result = await response.Content.ReadFromJsonAsync<OllamaChatResponse>();
-        var newConversation = ConversationMessage.CreateNew(sessionId,"assistant",result!.Message);
+        var newConversation = ConversationMessage.CreateNew(sessionId,"assistant",result!.Message.Content);
         _dbContext.Add(newConversation);
         session?.SetLastUpdatedAt();
 
         await _dbContext.SaveChangesAsync();
-        return result!.Message;
+        return result!.Message.Content;
     }
 }
 
-internal class OllamaChatRequest
+public class OllamaChatRequest
 {
-    [JsonPropertyName("model")]internal string Model { get; init;}
-    [JsonPropertyName("stream")] internal bool Stream { get; init;}
-    [JsonPropertyName("messages")] internal Message[] Messages { get; init;}
+    [JsonPropertyName("model")]public string Model { get; init;}
+    [JsonPropertyName("stream")] public bool Stream { get; init;}
+    [JsonPropertyName("messages")] public Message[] Messages { get; init;}
 
-    internal OllamaChatRequest(string model,bool stream, Message[] messages)
+    public OllamaChatRequest(string model,bool stream, Message[] messages)
     {
         Model = model;
         Stream = stream;
@@ -84,21 +97,24 @@ internal class OllamaChatRequest
 
 
 }
-internal class OllamaChatResponse
+public class OllamaChatResponse
 {
-    [JsonPropertyName("message")] internal string Message { get; init;}
-    internal OllamaChatResponse(string message)
+    [JsonPropertyName("message")] public Message Message { get; init;}
+    [JsonPropertyName("model")] public string Model { get; init;}
+   
+    public OllamaChatResponse(string model,Message message)
     {
+        Model = model;
         Message = message;
     }
 }
 
-internal class Message
+public class Message
 {
-    [JsonPropertyName("role")] internal string Role { get; init;}
-    [JsonPropertyName("content")] internal string Content { get; init;}
+    [JsonPropertyName("role")] public string Role { get; init;}
+    [JsonPropertyName("content")] public string Content { get; init;}
 
-    internal Message(string role, string content)
+    public Message(string role, string content)
     {
         Role = role; Content = content;
     }

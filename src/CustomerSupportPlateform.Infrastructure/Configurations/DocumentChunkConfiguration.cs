@@ -13,7 +13,7 @@ public class DocumentChunkConfiguration : IEntityTypeConfiguration<DocumentChunk
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(c => c.Embedding)
-            .HasColumnType("vector(1536)");
+            .HasColumnType("vector(768)");
     }
 }
 

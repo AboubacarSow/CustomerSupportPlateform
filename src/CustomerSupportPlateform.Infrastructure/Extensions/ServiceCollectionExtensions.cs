@@ -5,6 +5,7 @@ using CustomerSupportPlateform.Infrastructure.Ingestions;
 using CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 using CustomerSupportPlateform.Infrastructure.Interceptors;
 using CustomerSupportPlateform.Infrastructure.Persistence;
+using CustomerSupportPlateform.Infrastructure.Processors;
 using CustomerSupportPlateform.Infrastructure.PromptPreparation;
 using CustomerSupportPlateform.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -44,7 +45,7 @@ public static class ServiceCollectionExtensions
             var endpoint = configuration["Ollama:Endpoint"];
             ArgumentException.ThrowIfNullOrEmpty(endpoint);
             client.BaseAddress = new Uri(endpoint);
-            client.Timeout = TimeSpan.FromSeconds(1);
+            client.Timeout = TimeSpan.FromMinutes(30);
         });
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider,options) =>
@@ -54,6 +55,9 @@ public static class ServiceCollectionExtensions
             options.AddInterceptors(serviceProvider.GetRequiredService<ISaveChangesInterceptor>());
             
         });
+
+        services.AddHostedService<OutBoxMessageProcessor>();
+
         return services;
     }
 }

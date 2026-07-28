@@ -27,7 +27,7 @@ public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerato
         var content = extractor!.ExtractContent(notification.LocalPath);
         var chunks = _chunker.Chunk(content);
         
-        var index = -1;
+        var index = 0;
         foreach(var chunk in chunks)
         {
             var embeddedVector = await generator!.GenerateEmbeddingAsync(chunk);
