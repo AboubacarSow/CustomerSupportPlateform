@@ -2,5 +2,5 @@ namespace CustomerSupportPlateform.Application.Interfaces;
 
 public interface IContentChunker
 {
-    List<string> Chunk(string content);
+    List<string> Chunk(string content,string contentType);
 }

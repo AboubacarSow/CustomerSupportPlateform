@@ -1,6 +1,7 @@
 using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace CustomerSupportPlateform.Infrastructure.ChatCompletions;
 
@@ -24,10 +25,10 @@ internal class OllamaChatCompletion : IChatCompletion
 
     public async Task<string> RequestAsync(Guid sessionId, List<string> context, string question)
     {
-        var systemContent = _configuration["PromptSettings:System"];
+        var systemContent = _configuration["PromptSetting:System"];
 
-        var contextAsString = string.Join("\n", context);
-        var systemContentWithContext = string.Join("\n",systemContent, $"[Factuel Context]:\n{contextAsString}");
+        var contextAsString = string.Join("\"\\n\\n---\\n\\n\"\"\\n\\n---\\n\\n\"", context);
+        var systemContentWithContext = string.Join("\"\\n\\n---\\n\\n\"", systemContent, $"[Factuel Context]:\n{contextAsString}");
         var session =await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
         List<Message> usermessages =[];
         List<Message> assistantMessages=[];
@@ -40,7 +41,7 @@ internal class OllamaChatCompletion : IChatCompletion
         {
             var messages = _dbContext.ConversationMessages
                                         .AsNoTracking()
-                                        .Where(m => m.Id == sessionId)
+                                        .Where(m => m.SessionId == sessionId)
                                         .OrderBy(c=>c.CreatedAt);
 
             usermessages = [.. messages.Where(m => m.Role == "user")
@@ -60,8 +61,17 @@ internal class OllamaChatCompletion : IChatCompletion
         var request = new OllamaChatRequest(
             _configuration["Ollama:ChatModel"]!,
             false,
+            false,
             [..requestMessages]
             );
+        var json = System.Text.Json.JsonSerializer.Serialize(
+                    request,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+        _logger.LogInformation(json);
         var response = await _client.PostAsJsonAsync("api/chat",request);
         if (!response.IsSuccessStatusCode)
         {
@@ -86,16 +96,30 @@ public class OllamaChatRequest
     [JsonPropertyName("model")]public string Model { get; init;}
     [JsonPropertyName("stream")] public bool Stream { get; init;}
     [JsonPropertyName("messages")] public Message[] Messages { get; init;}
+    [JsonPropertyName("think")] public bool Think { get; init; }
 
-    public OllamaChatRequest(string model,bool stream, Message[] messages)
+    [JsonPropertyName("options")]
+    public OllamaOptions Options { get; init; } = new();
+
+    public OllamaChatRequest(string model,bool stream,bool think, Message[] messages)
     {
         Model = model;
         Stream = stream;
+        Think = think;  
         Messages = messages;
     }
 
 
 
+
+}
+public class OllamaOptions
+{
+    [JsonPropertyName("num_predict")]
+    public int NumPredict { get; init; } = 300;
+
+    [JsonPropertyName("temperature")]
+    public double Temperature { get; init; } = 0.2;
 }
 public class OllamaChatResponse
 {
@@ -116,6 +140,7 @@ public class Message
 
     public Message(string role, string content)
     {
-        Role = role; Content = content;
+        Role = role;
+        Content = content;
     }
 }

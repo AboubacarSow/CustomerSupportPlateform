@@ -25,7 +25,7 @@ public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerato
         var generator = _embeddingGenerators.FirstOrDefault(emb => emb.Environment == ModelsEnvironment.Development);
 
         var content = extractor!.ExtractContent(notification.LocalPath);
-        var chunks = _chunker.Chunk(content);
+        var chunks = _chunker.Chunk(content,notification.ContentType);
         
         var index = 0;
         foreach(var chunk in chunks)
