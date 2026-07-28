@@ -10,8 +10,8 @@ internal class MarkDownExtractor : IContentExtractor
     public string Format => TextContentTypes.MD;
     public string ExtractContent(string tempPath)
     {
-        if(File.Exists(tempPath))
-            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp folder");
+        if(!File.Exists(tempPath))
+            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp localstrogefolder");
 
         var stringBuilder = new StringBuilder();
         var markdow = File.ReadAllText(tempPath);

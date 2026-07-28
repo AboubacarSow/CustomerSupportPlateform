@@ -10,6 +10,7 @@ public class CreateSessionEndpoint : ICarterModule
             var newSession = await sender.Send(new CreateSessionCommand(request.Id));
 
             return Results.Ok(newSession);
-        });
+        }).WithDisplayName("Create a session to start chating")
+           .WithTags("Sessions");
     }
 }

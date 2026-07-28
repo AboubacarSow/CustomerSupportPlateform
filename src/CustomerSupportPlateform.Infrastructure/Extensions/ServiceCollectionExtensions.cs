@@ -3,10 +3,11 @@ using CustomerSupportPlateform.Infrastructure.ChatCompletions;
 using CustomerSupportPlateform.Infrastructure.Embeddings;
 using CustomerSupportPlateform.Infrastructure.Ingestions;
 using CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
+using CustomerSupportPlateform.Infrastructure.Interceptors;
 using CustomerSupportPlateform.Infrastructure.Persistence;
 using CustomerSupportPlateform.Infrastructure.PromptPreparation;
 using CustomerSupportPlateform.Infrastructure.Storage;
-using CustomerSupportPlateform.Infrastructure.Utilities;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBlobStorage, RailwayBucketStorage>();
         services.AddDefaultAWSOptions(configuration.GetAWSOptions());
         services.AddAWSService<IAmazonS3>();
-        services.AddScoped<ITempStorageService,TempStorageService>();
+        services.AddScoped<ILocalStorage,LocalStorage>();
         services.AddTransient<IEmbeddingGenerator,OpenAiEmbeddingGenerator>();
         services.AddTransient<IEmbeddingGenerator,OllamaEmbeddingGenerator>();
         services.AddScoped<IContentCleaner,ContentCleaner>();
@@ -37,6 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IChatCompletion,OllamaChatCompletion>();
         services.AddTransient<IChatCompletion,OpenAiChatCompletion>();
 
+        services.AddScoped<ISaveChangesInterceptor,DispatchDomainEventInterceptor>();
         services.AddHttpClient("Ollama-Client", client =>
         {
             var endpoint = configuration["Ollama:Endpoint"];
@@ -45,10 +47,11 @@ public static class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromSeconds(1);
         });
 
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<ApplicationDbContext>((serviceProvider,options) =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), 
                 optionsBuilder => optionsBuilder.UseVector());
+            options.AddInterceptors(serviceProvider.GetRequiredService<ISaveChangesInterceptor>());
             
         });
         return services;

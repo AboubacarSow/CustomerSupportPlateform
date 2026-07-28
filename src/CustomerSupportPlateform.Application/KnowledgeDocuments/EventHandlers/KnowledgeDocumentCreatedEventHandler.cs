@@ -21,10 +21,10 @@ public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerato
         //Mark As Indexing
         document.RaiseDomainEvent(new KnowledgeDocumentIndexingEvent(document.Id));
         // ingest : extracting -> cleaning -> chunking -> embedding -> persisting 
-        var extractor = _contentExtractors.FirstOrDefault(e=>e.Format == notification.DocumentFormat);
+        var extractor = _contentExtractors.FirstOrDefault(e=>e.Format == notification.ContentType);
         var generator = _embeddingGenerators.FirstOrDefault(emb => emb.Environment == ModelsEnvironment.Development);
 
-        var content = extractor!.ExtractContent(notification.TmpfilePath);
+        var content = extractor!.ExtractContent(notification.LocalPath);
         var chunks = _chunker.Chunk(content);
         
         var index = -1;
@@ -36,7 +36,8 @@ public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerato
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);
-        throw new NotImplementedException();
     }
+
+ 
 }
 

@@ -1,15 +1,20 @@
 using Carter;
 using CustomerSupportPlateform.API.Extensions;
-using Scalar.AspNetCore;
+using CustomerSupportPlateform.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddOpenApi();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddDependencies(builder.Configuration); 
 
-//builder.Services.AddAntiforgery();
+// Add services to the container.
+//builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDependencies(builder.Configuration);
+builder.Services.AddProblemDetails();
+
 
 
 var app = builder.Build();
@@ -17,15 +22,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    //app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
 
-    app.MapScalarApiReference(options =>
-    {
-        options.Title = "Customer Support Plateform API";
-    });
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-//app.UseAntiforgery();
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 app.MapCarter();
 

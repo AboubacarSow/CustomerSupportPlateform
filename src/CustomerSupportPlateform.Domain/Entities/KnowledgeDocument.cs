@@ -1,4 +1,5 @@
 using CustomerSupportPlateform.Domain.DDD;
+using CustomerSupportPlateform.Domain.Events;
 
 namespace CustomerSupportPlateform.Domain.Entities;
 
@@ -42,9 +43,14 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
     public static KnowledgeDocument Create(string title, string? description,string fileName, 
         string contentType, string path,long size)
     {
-        return !string.IsNullOrEmpty(description) ?
+
+        KnowledgeDocument knowledgeDocument = !string.IsNullOrEmpty(description) ?
             new (title, description, contentType, fileName, path, size, IndexStatus.Pending) :
             new (title, contentType, fileName, path, size, IndexStatus.Pending);
+        knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent
+            (knowledgeDocument.Id, knowledgeDocument.ContentType,knowledgeDocument.StoragePath));
+
+        return knowledgeDocument;
     }
     
     public void MarkAsIndexed()

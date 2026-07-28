@@ -1,9 +1,11 @@
+using System.Net.Mime;
+
 namespace CustomerSupportPlateform.Domain.Constants;
 
 public static class TextContentTypes 
 {
-    public const string PDF = "application/pdf";
-    public const string MD = "application/md";
-    public const string DOCX = "application/docx";
-    public const string TEXT = "application/text";
+    public const string PDF = MediaTypeNames.Application.Pdf;
+    public const string MD = MediaTypeNames.Text.Markdown;
+    public const string DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    public const string TEXT = MediaTypeNames.Text.Plain;
 }

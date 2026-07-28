@@ -2,7 +2,6 @@ using ConduitR.Abstractions;
 using CustomerSupportPlateform.Domain.DDD;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace CustomerSupportPlateform.Infrastructure.Interceptors;
 
@@ -10,21 +9,17 @@ public class DispatchDomainEventInterceptor(IServiceScopeFactory serviceScopeFac
 {
     private readonly IServiceScopeFactory _scopeFactory = serviceScopeFactory;
 
-    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+    // Because I want document being saved before my eventhandler starts its work
+    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
     {
-        DispatchDomainEvent(eventData.Context).GetAwaiter().GetResult();
-        return base.SavingChanges(eventData, result);
+        await DispatchDomainEvent(eventData.Context, cancellationToken) ;
+        return await base.SavedChangesAsync(eventData, result, cancellationToken);
     }
-    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
-    {
-        await DispatchDomainEvent(eventData.Context,cancellationToken);
-        return await base.SavingChangesAsync(eventData, result, cancellationToken);
-    }
-
+    
     private  async Task DispatchDomainEvent(DbContext? context,CancellationToken cancellationToken=default)
     {
         var scope = _scopeFactory.CreateScope();
-        var mediator = scope.ServiceProvider.GetService<IMediator>() 
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>() 
             ?? throw new ArgumentNullException("Mediator not instanciated");
         if (context == null)
             return;
@@ -41,7 +36,7 @@ public class DispatchDomainEventInterceptor(IServiceScopeFactory serviceScopeFac
 
         foreach(var raisedevent in events)
         {
-            await mediator.Publish(raisedevent,cancellationToken);
+            await mediator.Publish((dynamic)raisedevent,cancellationToken);
         }
     }
 }

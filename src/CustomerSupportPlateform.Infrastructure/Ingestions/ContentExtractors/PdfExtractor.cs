@@ -13,6 +13,8 @@ internal class PdfExtractor : IContentExtractor
 
     public string ExtractContent(string tempPath)
     {
+        if (!File.Exists(tempPath))
+            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp localstrogefolder");
         using var pdfDocument = PdfDocument.Open(tempPath);
         var stringBuilder = new StringBuilder();
         var wordExtractor = NearestNeighbourWordExtractor.Instance;

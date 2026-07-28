@@ -14,7 +14,7 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
             .WithMessage("File is required");
     }
 }
-public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStorageService tmpStorage,
+public class UploadDocumentHandler(ILocalStorage tmpStorage,
     IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
     public async ValueTask<(Guid, string, string, IndexStatus)> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
@@ -23,19 +23,18 @@ public class UploadDocumentHandler(IBlobStorage railwayStorageService,ITempStora
         await request.File.CopyToAsync(stream, cancellationToken);
         
       
-        var (key,size,contentType) = await railwayStorageService.UploadAsync(stream,
-                                    request.File.FileName,
-                                    request.File.ContentType,
-                                    cancellationToken);
+        //var (key,size,contentType) = await railwayStorageService.UploadAsync(stream,
+        //                            request.File.FileName,
+        //                            request.File.ContentType,
+        //                            cancellationToken);
 
 
         //Save file in tmp folder which behaves as buffer while ingestion
         var tmpPath = await tmpStorage.UploadFileToTempAsync(request.File);
         var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
-            request.File.FileName, contentType, key, size);
+            request.File.FileName, request.File.ContentType, tmpPath, request.File.Length);
 
          dbContext.Add(knowledgeDocument);
-         knowledgeDocument.RaiseDomainEvent(new KnowledgeDocumentCreatedEvent(knowledgeDocument.Id,contentType,tmpPath));
          await dbContext.SaveChangesAsync(cancellationToken);
          
 

@@ -12,6 +12,6 @@ public class ChatCompletionEndpoint : ICarterModule
             var result = await sender.Send(new ChatCompletionCommand(request.SessionId,request.Question));
 
             return Results.Ok(new ChatCompletionResponse(result.Message));
-        });
+        }).WithTags("Chats");
     }
 }

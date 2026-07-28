@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
             options.PublishStrategy = PublishStrategy.Parallel;
 
             options.AddBehavior(typeof(ValidationBehavior<,>));
+
         });
         services.AddConduitValidation(typeof(AssemblyReference).Assembly);
         return services;

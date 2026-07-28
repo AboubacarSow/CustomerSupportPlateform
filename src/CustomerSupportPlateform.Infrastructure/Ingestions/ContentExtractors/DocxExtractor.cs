@@ -9,8 +9,8 @@ internal class DocxExtractor : IContentExtractor
     public string ExtractContent(string tempPath)
     {
         //var stringBuilder = new StringBuilder();
-        if(File.Exists(tempPath))
-            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp folder");
+        if(!File.Exists(tempPath))
+            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp localstrogefolder");
         using var wordProcessingDoc = WordprocessingDocument.Open(tempPath,false);
        
         var body = wordProcessingDoc.MainDocumentPart?.Document!.Body;
