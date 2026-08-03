@@ -98,8 +98,8 @@ public class OllamaChatRequest
     [JsonPropertyName("messages")] public Message[] Messages { get; init;}
     [JsonPropertyName("think")] public bool Think { get; init; }
 
-    [JsonPropertyName("options")]
-    public OllamaOptions Options { get; init; } = new();
+    //[JsonPropertyName("options")]
+    //public OllamaOptions Options { get; init; } = new();
 
     public OllamaChatRequest(string model,bool stream,bool think, Message[] messages)
     {

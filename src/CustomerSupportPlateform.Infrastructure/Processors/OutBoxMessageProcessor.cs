@@ -59,7 +59,7 @@ public class OutBoxMessageProcessor(IServiceScopeFactory scopeFactory,ILogger<Ou
 
             }catch(Exception ex)
             {
-                _logger.LogError("Error occurred while Processing OutboxMessage");
+                _logger.LogError("Error occurred while Processing OutboxMessage: {Message}", ex.Message);
                 continue;
             }
             finally

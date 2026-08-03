@@ -7,31 +7,28 @@ namespace CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 
 internal class MarkDownExtractor : IContentExtractor
 {
-    public string Format => TextContentTypes.MD;
-    public string ExtractContent(string tempPath)
+   public string Format => TextContentTypes.MD;
+
+    public string ExtractContent(string filePath)
     {
-        if(!File.Exists(tempPath))
-            throw new ArgumentNullException($"File with Path:{tempPath} does not exist in Temp localstrogefolder");
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
-        var stringBuilder = new StringBuilder();
-        var markdow = File.ReadAllText(tempPath);
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"Markdown file was not found: {filePath}", filePath);
 
-        var document = Markdown.Parse(markdow);
+        var markdown = File.ReadAllText(filePath, Encoding.UTF8);
 
-        var allParagraphs = document.Descendants<ParagraphBlock>().ToArray();
+        return Normalize(markdown);
+    }
 
-        foreach( var block in allParagraphs)
-        {
-            if (block.Inline == null) continue;
-            foreach (var inline in block.Inline.Descendants<LiteralInline>())
-            {
-                stringBuilder.Append(inline.Content);
-            }
-                
-        }
-        
-
-        return stringBuilder.ToString();
-
+    private static string Normalize(string markdown)
+    {
+        return markdown
+            .Replace("\r\n", "\n")
+            .Replace("\r", "\n")
+            .Replace("\t", "    ")
+            .Replace("\u00A0", " ")
+            .Trim();
     }
 }

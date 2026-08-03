@@ -27,7 +27,7 @@ internal class VectorSearchSimilarity : IVectorSearchSimilarity
         var index = 0;
        foreach(var chunk in result)
         {
-            _logger.LogInformation("Chunk {index}: {Chunk}", index++, chunk.Chunk);
+            _logger.LogInformation("Chunk {index}: {Chunk}  score: {Score}", index++, chunk.Chunk, chunk.Embedding);
         }
         
         return [.. result.Select(c=>c.Chunk)];
