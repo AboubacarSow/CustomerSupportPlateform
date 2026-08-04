@@ -8,8 +8,9 @@ using CustomerSupportPlateform.Infrastructure.Persistence;
 using CustomerSupportPlateform.Infrastructure.Processors;
 using CustomerSupportPlateform.Infrastructure.PromptPreparation;
 using CustomerSupportPlateform.Infrastructure.Storage;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CustomerSupportPlateform.Infrastructure.Extensions;
@@ -55,6 +56,29 @@ public static class ServiceCollectionExtensions
             options.AddInterceptors(serviceProvider.GetRequiredService<ISaveChangesInterceptor>());
             
         });
+
+
+        
+
+        services.AddIdentityApiEndpoints<ApplicationUser>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 6;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+            options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedAccount=false;
+            
+            
+        }).AddRoles<ApplicationRole>() 
+            .AddApiEndpoints()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        
+
+        services.AddAuthorization();
+
 
         services.AddHostedService<OutBoxMessageProcessor>();
 

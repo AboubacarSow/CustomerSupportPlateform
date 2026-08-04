@@ -3,6 +3,7 @@ using System;
 using CustomerSupportPlateform.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
@@ -12,9 +13,11 @@ using Pgvector;
 namespace CustomerSupportPlateform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260804203936_EditApplicationUser")]
+    partial class EditApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,7 +152,7 @@ namespace CustomerSupportPlateform.Infrastructure.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("ConversationMessages", (string)null);
+                    b.ToTable("ConversationMessages");
                 });
 
             modelBuilder.Entity("CustomerSupportPlateform.Domain.Entities.DocumentChunk", b =>
@@ -186,7 +189,7 @@ namespace CustomerSupportPlateform.Infrastructure.Migrations
 
                     b.HasIndex("Language");
 
-                    b.ToTable("Chunks", (string)null);
+                    b.ToTable("Chunks");
                 });
 
             modelBuilder.Entity("CustomerSupportPlateform.Domain.Entities.KnowledgeDocument", b =>
@@ -236,7 +239,7 @@ namespace CustomerSupportPlateform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KnowledgeDocuments", (string)null);
+                    b.ToTable("KnowledgeDocuments");
                 });
 
             modelBuilder.Entity("CustomerSupportPlateform.Domain.Entities.OutBoxMessage", b =>
@@ -264,7 +267,7 @@ namespace CustomerSupportPlateform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OutBoxMessages", (string)null);
+                    b.ToTable("OutBoxMessages");
                 });
 
             modelBuilder.Entity("CustomerSupportPlateform.Domain.Entities.Session", b =>
@@ -281,7 +284,7 @@ namespace CustomerSupportPlateform.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

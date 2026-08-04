@@ -1,6 +1,7 @@
 using Carter;
 using CustomerSupportPlateform.API.Extensions;
 using CustomerSupportPlateform.API.Middlewares;
+using CustomerSupportPlateform.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,14 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
+
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGroup("api/identity")
+        .WithTags("Identity")
+        .MapIdentityApi<ApplicationUser>();
 
 app.MapCarter();
 

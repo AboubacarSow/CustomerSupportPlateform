@@ -1,10 +1,12 @@
 
 
 
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 namespace CustomerSupportPlateform.Infrastructure.Persistence;
 
 
-internal class ApplicationDbContext : DbContext, IApplicationDbContext
+internal class ApplicationDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,string>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {

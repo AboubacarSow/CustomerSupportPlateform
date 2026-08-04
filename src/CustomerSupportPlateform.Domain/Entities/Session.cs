@@ -18,6 +18,3 @@ public class Session : BaseEntity
 
     public static Session CreateNew(Guid id) => new(id);
 }
-
-
-
