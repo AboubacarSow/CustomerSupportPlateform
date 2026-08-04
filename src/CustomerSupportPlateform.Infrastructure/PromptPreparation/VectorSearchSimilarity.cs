@@ -11,7 +11,7 @@ namespace CustomerSupportPlateform.Infrastructure.PromptPreparation;
 internal class VectorSearchSimilarity : IVectorSearchSimilarity
 {
     private readonly ApplicationDbContext _dbContext ;
-    private readonly int _topK = 3;
+    private readonly int _topK = 4;
     private readonly ILogger<VectorSearchSimilarity> _logger;
 
     public VectorSearchSimilarity(ApplicationDbContext dbContext,ILogger<VectorSearchSimilarity> logger)
@@ -21,16 +21,19 @@ internal class VectorSearchSimilarity : IVectorSearchSimilarity
     }
     public async Task<List<string>> SearchAsync(Vector queryVector)
     {
-        var result = await _dbContext.Chunks.OrderBy(c=>c.Embedding!.CosineDistance(queryVector))
-                                            .Take(_topK)
-                                            .ToListAsync();
+        var result = await _dbContext.Chunks
+            .Select(c => new { c.Chunk, Distance = c.Embedding!.CosineDistance(queryVector) })
+            .OrderBy(c => c.Distance)
+            .Take(_topK)
+            .ToListAsync();
+
         var index = 0;
-       foreach(var chunk in result)
+        foreach (var chunk in result)
         {
-            _logger.LogInformation("Chunk {index}: {Chunk}  score: {Score}", index++, chunk.Chunk, chunk.Embedding);
+            _logger.LogInformation("Chunk {Index}: {Chunk} distance: {Distance}", index++, chunk.Chunk, chunk.Distance);
         }
-        
-        return [.. result.Select(c=>c.Chunk)];
+
+        return [.. result.Select(c => c.Chunk)];
     }
 }
 
