@@ -19,9 +19,11 @@ internal class VectorSearchSimilarity : IVectorSearchSimilarity
         _dbContext = dbContext;
         _logger = logger;
     }
-    public async Task<List<string>> SearchAsync(Vector queryVector)
+    public async Task<List<string>> SearchAsync(Vector queryVector,string queryString)
     {
+        var language = LanguageDetector.Detect(queryString);
         var result = await _dbContext.Chunks
+            .Where(c=>c.Language == language)
             .Select(c => new { c.Chunk, Distance = c.Embedding!.CosineDistance(queryVector) })
             .OrderBy(c => c.Distance)
             .Take(_topK)

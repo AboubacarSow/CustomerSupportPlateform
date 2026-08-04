@@ -31,7 +31,7 @@ public class KnowledgeDocumentCreatedEventHandler(IEnumerable<IEmbeddingGenerato
         foreach(var chunk in chunks)
         {
             var embeddedVector = await generator!.GenerateEmbeddingAsync(chunk);
-            var documentChunk = DocumentChunk.CreateNew(index++,document.Id,chunk,embeddedVector);
+            var documentChunk = DocumentChunk.CreateNew(index++,document.Id,chunk,embeddedVector,document.Language);
             _dbContext.Add(documentChunk);
         }
         

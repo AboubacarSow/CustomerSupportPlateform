@@ -9,3 +9,10 @@ public static class TextContentTypes
     public const string DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     public const string TEXT = MediaTypeNames.Text.Plain;
 }
+
+
+public enum Language
+{
+    English = 1,
+    Turkish = 2
+}

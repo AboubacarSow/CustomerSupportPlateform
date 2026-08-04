@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CustomerSupportPlateform.Infrastructure.Configurations;
+namespace CustomerSupportPlateform.Infrastructure.Persistence.Configurations;
 
 public class ConversationMessageConfiguration : IEntityTypeConfiguration<ConversationMessage>
 {

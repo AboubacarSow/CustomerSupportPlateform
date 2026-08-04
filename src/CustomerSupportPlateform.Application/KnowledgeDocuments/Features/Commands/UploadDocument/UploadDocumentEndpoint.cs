@@ -22,12 +22,17 @@ public class UploadDocumentEndpoint : ICarterModule
     private async Task<IResult> Handle ([FromServices] IMediator sender,
            [FromForm]string title,
            [FromForm]string description,
+           [FromForm] Language language,
            IFormFile file)
     {
-            var(document_id, document_title, document_description, document_status) = await sender.Send(new UploadDocumentCommand
+            var(document_id,
+            document_title,
+            document_description,
+            document_status) = await sender.Send(new UploadDocumentCommand
                                                                         (title,
                                                                         description!,
-                                                                        file));
+                                                                        language, file));
+                                                                   
             //return Results.CreatedAtRoute("/api/knowledges/", new { id });
             return Results.Ok(new UploadDocumentResponse(document_id, document_title, document_description, document_status));
     }

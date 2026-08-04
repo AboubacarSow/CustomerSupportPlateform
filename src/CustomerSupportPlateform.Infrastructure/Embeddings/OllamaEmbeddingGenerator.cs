@@ -26,7 +26,7 @@ internal class OllamaEmbeddingGenerator : IEmbeddingGenerator
     {
         var request = new OllamaEmbedRequest
         (
-            _configuration["Ollama:EmbeddingModel"],
+            _configuration["Ollama:EmbeddingModel"]!,
             chunk
         );
        

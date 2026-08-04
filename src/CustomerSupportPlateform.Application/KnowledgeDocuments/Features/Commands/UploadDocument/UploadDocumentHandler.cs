@@ -1,6 +1,6 @@
 namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Features.Commands.UploadDocument;
 
-public record UploadDocumentCommand(string Title, string Description, IFormFile File) : 
+public record UploadDocumentCommand(string Title, string Description,Language Language, IFormFile File) : 
     IRequest<(Guid,string,string,IndexStatus)>;
 
 public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
@@ -12,6 +12,9 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
 
         RuleFor(d => d.File).NotNull()
             .WithMessage("File is required");
+
+        RuleFor(d=>d.Language).NotEmpty()
+            .WithMessage("Language is required");
     }
 }
 public class UploadDocumentHandler(ILocalStorage tmpStorage,
@@ -30,9 +33,9 @@ public class UploadDocumentHandler(ILocalStorage tmpStorage,
 
 
         //Save file in tmp folder which behaves as buffer while ingestion
-        var tmpPath = await tmpStorage.UploadFileToTempAsync(request.File);
+        var tmpPath = await tmpStorage.UploadFileToTempAsync(request.File,request.Language);
         var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
-            request.File.FileName, request.File.ContentType, tmpPath, request.File.Length);
+            request.File.FileName, request.File.ContentType, tmpPath, request.File.Length, request.Language);
 
          dbContext.Add(knowledgeDocument);
          await dbContext.SaveChangesAsync(cancellationToken);

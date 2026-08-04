@@ -6,6 +6,8 @@ namespace CustomerSupportPlateform.Infrastructure.Storage;
 internal class LocalStorage : ILocalStorage
 {
     private readonly string localstrogefolder = "data/localblob";
+    private readonly string englishFolder = "en";
+    private readonly string turkishFolder = "tr";
 
     public LocalStorage()
     {
@@ -20,9 +22,12 @@ internal class LocalStorage : ILocalStorage
         File.Delete(path);
     }
 
-    public async Task<string> UploadFileToTempAsync(IFormFile file)
+    public async Task<string> UploadFileToTempAsync(IFormFile file, Language language)
     {
-        var folder = Path.Combine(Directory.GetCurrentDirectory(), localstrogefolder);
+        
+        var folder = Path.Combine(Directory.GetCurrentDirectory(), 
+            localstrogefolder,
+            language == Language.Turkish ? turkishFolder : englishFolder);
         var path = Path.Combine(folder, $"{file.FileName}");
         using var stream = new FileStream(path,FileMode.Create);
 

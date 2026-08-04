@@ -24,16 +24,20 @@ IVectorSearchSimilarity vectorSearch, ILogger<ChatCompletionHandler> logger) : I
     public async ValueTask<ChatResponseDto> Handle(ChatCompletionCommand request, CancellationToken cancellationToken)
     {
         var stopWatch = Stopwatch.StartNew();
+
         var embedding = await generator.GenerateEmbeddingAsync(request.Question);
         logger.LogInformation("Embedding Elapsed:{Elapsed} ms",stopWatch.ElapsedMilliseconds);
         stopWatch.Restart();
-        var context = await vectorSearch.SearchAsync(embedding);
+        var context = await vectorSearch.SearchAsync(embedding,request.Question);
         logger.LogInformation("Vector search Elapsed:{Elapsed} ms", stopWatch.ElapsedMilliseconds);
         stopWatch.Restart();
-        var ollamaChatHandler = chatHandlers.FirstOrDefault(h => h.Environment == ModelsEnvironment.Development);
+        var ollamaChatHandler = chatHandlers.First(h => h.Environment == ModelsEnvironment.Development);
+        
         var message = await ollamaChatHandler.RequestAsync(request.SessionId,context, request.Question);
         logger.LogInformation("Chat Response Elapsed:{Elapsed} ms", stopWatch.ElapsedMilliseconds);
 
         return new(message);
     }
 }
+
+

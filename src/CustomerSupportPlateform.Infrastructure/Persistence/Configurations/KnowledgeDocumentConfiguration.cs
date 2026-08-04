@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CustomerSupportPlateform.Infrastructure.Configurations;
+namespace CustomerSupportPlateform.Infrastructure.Persistence.Configurations;
 
 
 public class KnowledgeDocumentConfiguration : IEntityTypeConfiguration<KnowledgeDocument>
@@ -8,6 +8,9 @@ public class KnowledgeDocumentConfiguration : IEntityTypeConfiguration<Knowledge
     public void Configure(EntityTypeBuilder<KnowledgeDocument> builder)
     {
         builder.HasKey(k => k.Id);
+
+        builder.Property(k => k.Language)
+            .HasConversion<string>();
 
         builder.Property(k => k.Status)
             .HasConversion<string>();
