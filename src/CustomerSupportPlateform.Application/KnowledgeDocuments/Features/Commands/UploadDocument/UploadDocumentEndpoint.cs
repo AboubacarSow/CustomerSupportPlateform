@@ -16,7 +16,8 @@ public class UploadDocumentEndpoint : ICarterModule
         .Produces<UploadDocumentResponse>((int)HttpStatusCode.OK)
         .WithDescription("Uploads Knowledge Document")
         .WithTags("Knowledges")
-        .DisableAntiforgery();
+        .DisableAntiforgery()
+        .RequireAuthorization(Roles.Admin);
     }
 
     private async Task<IResult> Handle ([FromServices] IMediator sender,
