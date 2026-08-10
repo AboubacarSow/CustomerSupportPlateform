@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using webAdmin.Models;
 using webAdmin.Utilities;
 
@@ -11,10 +11,13 @@ namespace webAdmin.Services;
 
 public interface IAuthenticationService
 {
-    Task<string?> LoginAsync(string email, string password);
-    Task<bool> RegisterAsync(string firstName, string lastName, string email, string password);
+    Task<bool?> LoginAsync(string email, string password);
+    Task<bool> RegisterAsync(RegisterDto model);
     Task LogoutAsync();
-    Task SignInWithTokenAsync(TokenContainer tokenContainer);
+    Task SignInWithTokenAsync();
+
+    bool IsAuthenticated { get; set; }
+    CurrentUserDto CurrentUser { get; set; }
 }
 public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpContextAccessor httpContextAccessor,
     TokenContainer tokenContainer) : IAuthenticationService
@@ -23,27 +26,41 @@ public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpCon
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("ChatbotApi");
     private readonly TokenContainer _tokenContainer = tokenContainer;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    public async Task<string?> LoginAsync(string email, string password)
+
+    public bool IsAuthenticated { get; set; } = false;
+
+    public CurrentUserDto CurrentUser { set; get; } = default!;
+
+
+
+    public async Task<bool?> LoginAsync(string email, string password)
     {
         var request = CreateHttpRequest(new { Email = email, Password = password });
-        var response = await _httpClient.PostAsync("/identity/login", request);
+        var response = await _httpClient.PostAsync("identity/login", request);
 
         if (!response.IsSuccessStatusCode)
-            return null;
+            return false;
 
         var content = await response.Content.ReadAsStringAsync();
 
-        var tokenResponse = JsonSerializer.Deserialize<TokenContainer>(content);
-        _tokenContainer.SetRefreshToken(tokenResponse.RefreshToken);
+        var tokenResponse = JsonConvert.DeserializeObject<TokenContainer>(content);
+        if(tokenResponse== null) return null;
+        _tokenContainer.SetRefreshToken(tokenResponse.RefreshToken!);
         _tokenContainer.SetAccessToken(tokenResponse.AccessToken);  
-        _tokenContainer.SetExpiresIn(tokenResponse.ExpiresIn);  
-        return tokenResponse.AccessToken;
+        _tokenContainer.SetExpiresIn(tokenResponse.ExpiresIn);
+        return true;
     }
 
-    public async Task<bool> RegisterAsync(string firstName, string lastName, string email, string password)
+    public async Task<bool> RegisterAsync(RegisterDto model)
     {
-        var request = CreateHttpRequest(new {Email=email, Password = password, FirstName= firstName,LastName=lastName});
-        var response = await _httpClient.PostAsync("/identiy/register", request);
+        var request = CreateHttpRequest(new 
+        { 
+            model.Email,
+            model.Password,
+            model.FirstName,
+            model.LastName 
+        });
+        var response = await _httpClient.PostAsync("identity/register", request);
         if (!response.IsSuccessStatusCode)
             return false;
 
@@ -53,7 +70,7 @@ public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpCon
 
     private static StringContent CreateHttpRequest(object data)
     {
-        var json = JsonSerializer.Serialize(data);
+        var json = JsonConvert.SerializeObject(data);
 
         return new StringContent(json,Encoding.UTF8,"application/json");
 
@@ -67,9 +84,9 @@ public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpCon
         return context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
-    public async Task SignInWithTokenAsync(TokenContainer tokenContainer)
+    public async Task SignInWithTokenAsync()
     {
-        var response = await _httpClient.GetFromJsonAsync<CurrentUserDto>("/account/me");
+        var response = await _httpClient.GetFromJsonAsync<CurrentUserDto>("account/me");
         if (response is null)
             return;
         var claims = new List<Claim>()
@@ -81,7 +98,7 @@ public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpCon
         claims.AddRange(response.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var expiration = tokenContainer.ExpiresIn;
+        var expiration = _tokenContainer.ExpiresIn;
         var principal = new ClaimsPrincipal(identity);
         var context = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("HttpContext is not available.");
         await context.SignInAsync(
@@ -94,7 +111,8 @@ public class AuthenticationManager(IHttpClientFactory httpClientFactory,IHttpCon
                 ExpiresUtc = DateTime.Now.AddSeconds(expiration),
             }
         );
-
+        IsAuthenticated = true;
+        CurrentUser = new(response.Id, response.Email, [.. response.Roles]);
 
     }
 }

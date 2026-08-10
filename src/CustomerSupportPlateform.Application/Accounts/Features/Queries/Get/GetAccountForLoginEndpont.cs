@@ -6,7 +6,7 @@ public class GetAccountForLoginEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-       app.MapGet("api/account/me", (ClaimsPrincipal user) =>
+       app.MapGet("/api/account/me", (ClaimsPrincipal user) =>
         {
             return Results.Ok(new
             {

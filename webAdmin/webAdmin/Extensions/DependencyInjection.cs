@@ -47,8 +47,8 @@ public static class DependencyInjection
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = "/account/login";
-                options.LogoutPath = "/account/logout";
+                options.LoginPath = "/auth/login";
+                options.LogoutPath = "/auth/logout";
                 //options.AccessDeniedPath = "/account/accessDenied";
 
                 options.SlidingExpiration = true;
@@ -59,7 +59,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<HttpContextAccessor>();
 
-        services.AddScoped<HttpClient>();
+        //services.AddScoped<HttpClient>();
 
 
     }

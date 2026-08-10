@@ -1,7 +1,111 @@
 ﻿@page "/auth/login"
 
-<h3>Login</h3>
+@layout AuthLayout
 
+@using System.ComponentModel.DataAnnotations
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager _navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Login</PageTitle>
+<div class="form-container">
+    <div class="mb-3 title">
+        <h4 class="text-center">
+            <i class="fas fa-sign-in-alt me-2"></i>
+            Login
+        </h4>
+    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            Please enter your email and password.
+        </div>
+    }
+    <EditForm Model="loginModel" OnValidSubmit="LoginUser" Enhance>
+        <DataAnnotationsValidator />
+        <div class="d-grid col-auto">
+            <div class="my-3">
+                <label class="form-label">Email</label>
+                <InputText type="email" @bind-Value="loginModel.email" class="@GetInputClass(nameof(loginModel.email))"
+                placeholder="email@example.com" />
+                <ValidationMessage For="@(() => loginModel.email)" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <InputText type="password" @bind-Value="loginModel.password"
+                class="@GetInputClass(nameof(loginModel.password))" placeholder="Password" />
+                <ValidationMessage For="@(() => loginModel.password)" />
+            </div>
+            <div class="d-grid justify-content-center">
+                <div>Don't have an account yet? <a href="/account/register">Register</a></div>
+                <button type="submit" class="btn btn-primary m-4">
+                    <i class="fa fa-sign-in-alt"></i>
+                    <span class="ms-2">Login</span>
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
 @code {
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
 
+    private string? errorMessage = string.Empty;
+
+    [SupplyParameterFromForm(FormName = "LoginForm")]
+    private LoginModel loginModel { get; set; } = new();
+
+    [CascadingParameter] private EditContext? editContext { get; set; }
+
+    private async Task LoginUser()
+    {
+        try
+        {
+            var isSucceded = await AuthenticationService.LoginAsync(loginModel.email, loginModel.password);
+
+            if (isSucceded.HasValue && isSucceded.Value == true)
+            {
+                _navigationManager.NavigateTo(
+                    "/login-callback?isTokenExist=true", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = "Invalid email or password.";
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("console.log", $"{ex}");
+            errorMessage = "Something went wrong. Please try again.";
+            StateHasChanged();
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string password { get; set; } = string.Empty;
+    }
+
+    private string GetInputClass(string fieldName)
+    {
+        if (editContext == null)
+            return "form-control form-input";
+
+        var fieldIdentifier = new FieldIdentifier(loginModel, fieldName);
+        var fieldState = editContext.GetValidationMessages(fieldIdentifier);
+
+        return fieldState.Any() ? "form-control form-input is-invalid" : "form-control form-input";
+    }
 }

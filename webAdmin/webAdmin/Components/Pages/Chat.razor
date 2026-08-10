@@ -1,0 +1,74 @@
+﻿@page "/chat"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using webAdmin.Components.Chat
+@using webAdmin.Services
+
+@inject IChatCompletionService ChatService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Chat</PageTitle>
+
+<div class="chat-page">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div>
+                <h1>Customer Support</h1>
+                <p>How can we help you today?</p>
+            </div>
+        </div>
+
+        <ChatWidget Messages="@Messages"
+                    IsLoading="@IsLoading"
+                    OnSendMessage="@SendMessageAsync" />
+    </div>
+</div>
+
+@code {
+    private readonly Guid _sessionId = Guid.NewGuid();
+
+    private List<ChatMessageModel> Messages { get; set; } = [];
+
+    private bool IsLoading;
+
+    private async Task SendMessageAsync(string question)
+    {
+        if (string.IsNullOrWhiteSpace(question) || IsLoading)
+            return;
+
+        Messages.Add(new ChatMessageModel(
+            ChatMessageRole.User,
+            question));
+
+        IsLoading = true;
+
+        try
+        {
+            var request = new ChatRequestDto(
+                _sessionId,
+                question);
+
+            var response = await ChatService.GetMessageAsync(request);
+
+            Messages.Add(new ChatMessageModel(
+                ChatMessageRole.Assistant,
+                response));
+        }
+        catch (HttpRequestException)
+        {
+            Messages.Add(new ChatMessageModel(
+                ChatMessageRole.Assistant,
+                "Unable to connect to the customer support service."));
+        }
+        catch (Exception)
+        {
+            Messages.Add(new ChatMessageModel(
+                ChatMessageRole.Assistant,
+                "An unexpected error occurred."));
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

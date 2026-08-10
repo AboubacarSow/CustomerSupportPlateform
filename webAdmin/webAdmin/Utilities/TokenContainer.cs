@@ -4,15 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace webAdmin.Utilities;
 
-public record TokenContainer : INotifyPropertyChanged
+public class TokenContainer : INotifyPropertyChanged
 {
 
-    public TokenContainer(string accesstoken,string refreshToken,int expiresIn)
-    {
-        AccessToken = accesstoken;
-        RefreshToken = refreshToken;
-        ExpiresIn = expiresIn;
-    }
+    
     private string? _token;
 
     public string AccessToken
@@ -33,22 +28,38 @@ public record TokenContainer : INotifyPropertyChanged
     }
 
     public int ExpiresIn { get;private set; }
-    public string RefreshToken { get;private set; }
+    public string? RefreshToken { get;private set; }
 
     public void SetExpiresIn(int expiresIn) => ExpiresIn = expiresIn;
     public void SetRefreshToken(string refreshToken) => RefreshToken = refreshToken;
     public void SetAccessToken(string accessToken) => AccessToken = accessToken;
+
+    public string GetAccessToken() => AccessToken?? null!;
+
+    public void Clear()
+    {
+        AccessToken = string.Empty;
+        RefreshToken= string.Empty;
+        ExpiresIn= 0;
+    }
+
+
 }
 
-public class TokenHandler(TokenContainer tokentContainer) : DelegatingHandler
+public class TokenHandler : DelegatingHandler
 {
-    private readonly TokenContainer _tokentContainer = tokentContainer;
+    private readonly TokenContainer _tokentContainer ;
+
+    public TokenHandler(TokenContainer tokentContainer)
+    {
+        _tokentContainer = tokentContainer;
+    }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         var token=_tokentContainer.AccessToken;   
-        if (!string.IsNullOrEmpty(token))
+        if (!string.IsNullOrEmpty(token) || token is not null)
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",token);
         }

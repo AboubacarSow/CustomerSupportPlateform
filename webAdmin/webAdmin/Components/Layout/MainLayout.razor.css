@@ -1,98 +1,165 @@
-.page {
-    position: relative;
+.main-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    color: #111827;
+}
+
+
+/* Header */
+
+.main-header {
+    height: 72px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+/* Brand */
+
+.brand {
+    margin-right: 50px;
+}
+
+    .brand a {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+.brand-logo {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #2563eb;
+    color: white;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.brand-text {
     display: flex;
     flex-direction: column;
 }
 
-main {
+    .brand-text strong {
+        font-size: 16px;
+    }
+
+    .brand-text span {
+        margin-top: 2px;
+        color: #6b7280;
+        font-size: 10px;
+    }
+
+
+/* Navigation */
+
+.main-navigation {
+    display: flex;
+    align-items: center;
+    gap: 25px;
     flex: 1;
 }
 
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
+    .main-navigation a {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+    }
 
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
+        .main-navigation a:hover {
+            color: #2563eb;
+        }
+
+        .main-navigation a.active {
+            color: #2563eb;
+        }
+
+
+/* Actions */
+
+.header-actions {
     display: flex;
     align-items: center;
+    gap: 18px;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
-
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
-
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        margin-left: 0;
-    }
+.login-link {
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
+    .login-link:hover {
+        color: #2563eb;
     }
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
-
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .top-row.auth ::deep a:first-child {
-        flex: 1;
-        text-align: right;
-        width: 0;
-    }
-
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+.register-button {
+    padding: 9px 16px;
+    border-radius: 7px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-#blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
+    .register-button:hover {
+        background: #1d4ed8;
+    }
+
+
+/* Content */
+
+.main-content {
+    padding-bottom:1em;
+    flex: 1;
     width: 100%;
-    z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
+
+/* Footer */
+
+.main-footer {
+    min-height: 60px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+@media (max-width: 800px) {
+
+    .main-header {
+        padding: 0 20px;
     }
+
+    .main-navigation {
+        display: none;
+    }
+
+    .brand {
+        margin-right: auto;
+    }
+
+    .main-footer {
+        padding: 0 20px;
+    }
+}

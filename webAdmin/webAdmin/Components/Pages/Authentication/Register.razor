@@ -1,6 +1,120 @@
 ﻿@page "/auth/register"
-<h3>Register</h3>
+@layout AuthLayout
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager _navigationManager
+@rendermode InteractiveServer
 
+<PageTitle>Register</PageTitle>
+
+<div class="form-container">
+    <div class="mb-3 title">
+        <h4 class="text-center">
+            <i class="fas fa-user-plus me-2"></i>
+            Register
+        </h4>
+    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger"
+             role="alert">
+            @errorMessage
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            Create your account to get started.
+        </div>
+    }
+    <EditForm Model="registerModel" OnValidSubmit="RegisterUser" Enhance>
+        <DataAnnotationsValidator />
+        <div class="d-grid col-auto">
+            <div class="my-3">
+                <label class="form-label">First name</label>
+                <InputText @bind-Value="registerModel.FirstName"
+                           class="@GetInputClass(nameof(registerModel.FirstName))" placeholder="First name" />
+                <ValidationMessage For="@(() => registerModel.FirstName)" />
+            </div>
+            <div class="my-3">
+                <label class="form-label">Last name</label>
+                <InputText @bind-Value="registerModel.LastName"
+                class="@GetInputClass(nameof(registerModel.LastName))" placeholder="Last name" />
+                <ValidationMessage For="@(() => registerModel.LastName)" />
+            </div>
+            <div class="my-3">
+                <label class="form-label">Email</label>
+                <InputText type="email" @bind-Value="registerModel.Email"
+                class="@GetInputClass(nameof(registerModel.Email))" placeholder="email@example.com" />
+                <ValidationMessage For="@(() => registerModel.Email)" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <InputText type="password" @bind-Value="registerModel.Password"
+                class="@GetInputClass(nameof(registerModel.Password))" placeholder="Password" />
+                <ValidationMessage For="@(() => registerModel.Password)" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm password</label>
+                <InputText type="password" @bind-Value="registerModel.ConfirmPassword"
+                class="@GetInputClass(nameof(registerModel.ConfirmPassword))" placeholder="Confirm password" />
+                <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+            </div>
+            <div class="d-grid justify-content-center">
+                <div>Already have an account? <a href="/account/login">Login</a></div>
+                <button type="submit" class="btn btn-primary m-4">
+                    <i class="fa fa-user-plus"></i>
+                    <span class="ms-2">Register</span>
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
 @code {
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
 
+    private string? errorMessage = string.Empty;
+
+    [SupplyParameterFromForm(FormName = "RegisterForm")]
+    private RegisterDto registerModel { get; set; } = new();
+
+    [CascadingParameter] private EditContext? editContext { get; set; }
+
+    private async Task RegisterUser()
+    {
+        try
+        {
+            var succeeded = await AuthenticationService.RegisterAsync(
+                registerModel);
+
+            if (succeeded)
+            {
+                _navigationManager.NavigateTo("/auth/login?registered=true", forceLoad: true);
+            }
+            else
+            {
+                errorMessage = "Registration failed. The email may already be in use, or the password doesn't meet the requirements.";
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("console.log", $"{ex}");
+            errorMessage = "Something went wrong. Please try again.";
+            StateHasChanged();
+        }
+    }
+
+
+    private string GetInputClass(string fieldName)
+    {
+        if (editContext == null)
+            return "form-control form-input";
+
+        var fieldIdentifier = new FieldIdentifier(registerModel, fieldName);
+        var fieldState = editContext.GetValidationMessages(fieldIdentifier);
+
+        return fieldState.Any() ? "form-control form-input is-invalid" : "form-control form-input";
+    }
 }

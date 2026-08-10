@@ -1,0 +1,46 @@
+﻿<div class="message-row @GetMessageClass()">
+
+    <div class="message-avatar">
+        @if (Message.Role == ChatMessageRole.User)
+        {
+            <span>U</span>
+        }
+        else
+        {
+            <span>S</span>
+        }
+    </div>
+
+    <div class="message-content">
+
+        <div class="message-sender">
+            @if (Message.Role == ChatMessageRole.User)
+            {
+                <span>You</span>
+            }
+            else
+            {
+                <span>Systek Assistant</span>
+            }
+        </div>
+
+        <div class="message-bubble">
+            @Message.Content
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public ChatMessageModel Message { get; set; } = default!;
+
+    private string GetMessageClass()
+    {
+        return Message.Role == ChatMessageRole.User
+            ? "user"
+            : "assistant";
+    }
+}

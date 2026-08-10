@@ -8,8 +8,6 @@ public interface IChatCompletionService
 {
     Task<string> GetMessageAsync(ChatRequestDto request);
 
-
-
 }
 public class ChatCompletionService(IHttpClientFactory httpClientFactory)
     : IChatCompletionService
