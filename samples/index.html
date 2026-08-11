@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Systek Bilişim — Digital Transformation Consulting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">
+      <span class="logo-mark"></span>
+      Systek Bilişim
+    </div>
+
+    <div class="links">
+      <a href="#services" id="nav-services"></a>
+      <a href="#widget" id="nav-support"></a>
+      <a href="#integrate" id="nav-integrate"></a>
+    </div>
+
+     <div class="nav-actions">
+        <div class="language-switcher">
+            <button id="lang-en" type="button">EN</button>
+            <span>/</span>
+            <button id="lang-tr" type="button">TR</button>
+        </div>
+
+        <a class="nav-cta" href="#widget" id="nav-cta"></a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+
+      <div class="eyebrow">
+        <span class="dot"></span>
+        <span id="hero-eyebrow"></span>
+      </div>
+
+      <h1 id="hero-title"></h1>
+
+      <p class="lede" id="hero-description"></p>
+
+      <div class="hero-actions">
+        <a class="btn-primary" href="#widget" id="hero-primary"></a>
+        <a class="btn-ghost" href="#services" id="hero-secondary"></a>
+      </div>
+
+    </div>
+
+    <div class="network-graphic" aria-hidden="true">
+      <!-- Your existing SVG -->
+    </div>
+  </header>
+
+  <div class="trust-strip">
+    <div class="trust-strip-inner">
+      <div id="trust-item-1"></div>
+      <div id="trust-item-2"></div>
+      <div id="trust-item-3"></div>
+      <div id="trust-item-4"></div>
+    </div>
+  </div>
+
+  <section class="panel" id="services">
+
+    <div class="section-head">
+      <div class="kicker" id="services-kicker"></div>
+      <h2 id="services-title"></h2>
+      <p id="services-description"></p>
+    </div>
+
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="icon">◆</div>
+        <h3 id="service-digital-title"></h3>
+        <p id="service-digital-description"></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">◇</div>
+        <h3 id="service-management-title"></h3>
+        <p id="service-management-description"></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">△</div>
+        <h3 id="service-data-title"></h3>
+        <p id="service-data-description"></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">▢</div>
+        <h3 id="service-ai-title"></h3>
+        <p id="service-ai-description"></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">◈</div>
+        <h3 id="service-enterprise-title"></h3>
+        <p id="service-enterprise-description"></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">◉</div>
+        <h3 id="service-org-title"></h3>
+        <p id="service-org-description"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="panel" id="integrate">
+
+    <div class="integrate">
+
+      <div>
+        <div class="kicker" id="integrate-kicker"></div>
+
+        <h2 id="integrate-title"></h2>
+
+        <p id="integrate-description"></p>
+
+        <ul id="integrate-features"></ul>
+      </div>
+
+      <div class="code-block">
+
+        <div class="code-head">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <pre class="mono">
+        &lt;script
+            src="chatbot-widget.js"
+            data-api-url="https://your-api-url"
+            data-primary-color="#4f5dff"
+            data-title="Systek Support"
+            data-greeting="Hi! How can I help you?"
+            defer&gt;
+        &lt;/script&gt;
+          </pre>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <div id="widget"></div>
+
+  <footer id="footer"></footer>
+
+  <!-- Content -->
+  <script src="content.js"></script>
+
+  <!-- Website logic -->
+  <script src="script.js"></script>
+
+  <!-- Chatbot -->
+  <script src="chatbot-widget.js" data-api-url="https://localhost:7048" data-primary-color="#4f5dff"
+    data-title="Systek Support" data-greeting="Hi! How can I help you?" defer>
+    </script>
+
+</body>
+
+
+<script src="script.js"></script>
+
+</html>

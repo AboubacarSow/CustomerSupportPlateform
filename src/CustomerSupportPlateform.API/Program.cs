@@ -16,7 +16,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddDependencies(builder.Configuration);
 builder.Services.AddProblemDetails();
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ChatWidget", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .WithMethods("POST")
+            .WithHeaders("Content-Type");
+    });
+});
 
 var app = builder.Build();
 
@@ -33,6 +41,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
 
+app.UseCors("ChatWidget");
 
 app.UseAuthentication();
 app.UseAuthorization();
