@@ -16,6 +16,8 @@ public class GetAccountForLoginEndpoint : ICarterModule
                             .Select(r => r.Value)
             });
         })
+         .WithTags("Identity")
+         .WithGroupName("api/identity")
         .RequireAuthorization();
     }
 }
