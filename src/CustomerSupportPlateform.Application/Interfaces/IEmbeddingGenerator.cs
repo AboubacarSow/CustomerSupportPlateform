@@ -5,5 +5,5 @@ namespace CustomerSupportPlateform.Application.Interfaces;
 public interface IEmbeddingGenerator
 {
     ModelsEnvironment Environment {get;}
-    Task<Vector> GenerateEmbeddingAsync(string chunk);
+    Task<Vector?> GenerateEmbeddingAsync(string chunk);
 }

@@ -22,7 +22,7 @@ internal class OllamaEmbeddingGenerator : IEmbeddingGenerator
         _configuration = configuration;
         _logger = logger;
     }
-    public async Task<Vector> GenerateEmbeddingAsync(string chunk)
+    public async Task<Vector?> GenerateEmbeddingAsync(string chunk)
     {
         var request = new OllamaEmbedRequest
         (
@@ -35,9 +35,11 @@ internal class OllamaEmbeddingGenerator : IEmbeddingGenerator
         {
             var body = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Embedding request Failed:{Message}", body);
-            throw new HttpRequestException("Failed to embed chunk");
+           
+           return null;
+
         }
-        //response.EnsureSuccessStatusCode();         
+        response.EnsureSuccessStatusCode();         
         var result = await response.Content.ReadFromJsonAsync<OllamaEmbedResponse>();
         var vector = new Vector(result!.Embedding[0]);
 

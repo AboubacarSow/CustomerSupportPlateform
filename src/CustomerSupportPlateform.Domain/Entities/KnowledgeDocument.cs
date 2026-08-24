@@ -57,6 +57,15 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
 
         return knowledgeDocument;
     }
+
+    public void UpgradeDocumentContent(string title, string? description, long size)
+    {
+        Title = title;
+        Description = description;
+        FileSize = size;
+
+
+    }
     
     public void MarkAsIndexed()
     {
@@ -67,6 +76,10 @@ public class KnowledgeDocument : BaseEntity, IHasDomainEvent
     public void MarkAsIndexing()
     {
         Status = IndexStatus.Indexing;
+
+    }
+    public void MarkAsFailed(){
+        Status = IndexStatus.Failed;
     }
 
     #region Domain Driven Design

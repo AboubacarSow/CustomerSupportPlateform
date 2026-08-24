@@ -10,8 +10,8 @@ public class ConversationMessage : BaseEntity
     private ConversationMessage(Guid sessionId,
         string role, string content)
     {
-        SessionId = sessionId;
         Role = role;
+        SessionId = sessionId;
         Content = content;
     }
     public static ConversationMessage CreateNew(Guid sessionId,

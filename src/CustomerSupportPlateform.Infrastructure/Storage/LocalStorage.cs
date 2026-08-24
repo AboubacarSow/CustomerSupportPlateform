@@ -35,4 +35,12 @@ internal class LocalStorage : ILocalStorage
 
         return path;
     }
+    public bool IsFileAlreadyExists(string fileName, Language language)
+    {
+         var folder = Path.Combine(Directory.GetCurrentDirectory(), 
+            localstrogefolder,
+            language == Language.Turkish ? turkishFolder : englishFolder);
+        var path = Path.Combine(folder, $"{fileName}");
+        return File.Exists(path);
+    }
 }

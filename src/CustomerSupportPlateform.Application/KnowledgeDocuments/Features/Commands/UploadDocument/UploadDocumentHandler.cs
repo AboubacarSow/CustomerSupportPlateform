@@ -1,3 +1,6 @@
+using CustomerSupportPlateform.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
+
 namespace CustomerSupportPlateform.Application.KnowledgeDocuments.Features.Commands.UploadDocument;
 
 public record UploadDocumentCommand(string Title, string Description,Language Language, IFormFile File) : 
@@ -17,7 +20,7 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
             .WithMessage("Language is required");
     }
 }
-public class UploadDocumentHandler(ILocalStorage tmpStorage,
+public class UploadDocumentHandler(ILocalStorage localStorage,
     IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
     public async ValueTask<(Guid, string, string, IndexStatus)> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
@@ -25,26 +28,55 @@ public class UploadDocumentHandler(ILocalStorage tmpStorage,
         using var stream = new MemoryStream();
         await request.File.CopyToAsync(stream, cancellationToken);
         
-      
-        //var (key,size,contentType) = await railwayStorageService.UploadAsync(stream,
-        //                            request.File.FileName,
-        //                            request.File.ContentType,
-        //                            cancellationToken);
+
+        var isFileTheSameNameExist = localStorage.IsFileAlreadyExists(request.File.FileName,request.Language);
+
+        var localStoragePath = await localStorage.UploadFileToTempAsync(request.File,request.Language);
+        
+
+        if (isFileTheSameNameExist)
+        {
+            var document = await dbContext.KnowledgeDocuments.FirstOrDefaultAsync(x=>x.StoragePath == localStoragePath,
+                cancellationToken)
+               ?? throw new KnowledgeDocumentNotFoundException($"KnowledgeDocument with local storage:{localStoragePath} not found");
 
 
-        //Save file in tmp folder which behaves as buffer while ingestion
-        var tmpPath = await tmpStorage.UploadFileToTempAsync(request.File,request.Language);
-        var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
-            request.File.FileName, request.File.ContentType, tmpPath, request.File.Length, request.Language);
+            document.UpgradeDocumentContent(request.Title,
+                request.Description,
+                request.File.Length);
 
-         dbContext.Add(knowledgeDocument);
-         await dbContext.SaveChangesAsync(cancellationToken);
+            document.RaiseDomainEvent(new KnowledgeDocumentContentUpgradedEvent(document.Id,
+                                document.ContentType,
+                                document.StoragePath));
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return (document.Id,
+               document.Title,
+               document.Description!,
+               document.Status);
+
+        }
+        else
+        {
+            var knowledgeDocument = KnowledgeDocument.Create(request.Title, request.Description,
+                                request.File.FileName,
+                                request.File.ContentType,
+                                localStoragePath, request.File.Length,
+                                request.Language);
+
+             dbContext.Add(knowledgeDocument);
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return (knowledgeDocument.Id,
+           knowledgeDocument.Title,
+           knowledgeDocument.Description!,
+           knowledgeDocument.Status);
+        }
          
 
-        return (knowledgeDocument.Id,
-            knowledgeDocument.Title,
-            knowledgeDocument.Description! ,
-            knowledgeDocument.Status);
+       
 
     }
 

@@ -8,17 +8,12 @@ using System.Net.WebSockets;
 namespace CustomerSupportPlateform.Infrastructure.PromptPreparation;
 
 
-internal class VectorSearchSimilarity : IVectorSearchSimilarity
+internal class VectorSearchSimilarity(ApplicationDbContext context) : IVectorSearchSimilarity
 {
-    private readonly ApplicationDbContext _dbContext ;
+    private readonly ApplicationDbContext _dbContext = context;
     private readonly int _topK = 4;
-    private readonly ILogger<VectorSearchSimilarity> _logger;
 
-    public VectorSearchSimilarity(ApplicationDbContext dbContext,ILogger<VectorSearchSimilarity> logger)
-    {
-        _dbContext = dbContext;
-        _logger = logger;
-    }
+   
     public async Task<List<string>> SearchAsync(Vector queryVector,string queryString)
     {
         var language = LanguageDetector.Detect(queryString);
@@ -28,12 +23,6 @@ internal class VectorSearchSimilarity : IVectorSearchSimilarity
             .OrderBy(c => c.Distance)
             .Take(_topK)
             .ToListAsync();
-
-        var index = 0;
-        foreach (var chunk in result)
-        {
-            _logger.LogInformation("Chunk {Index}: {Chunk} distance: {Distance}", index++, chunk.Chunk, chunk.Distance);
-        }
 
         return [.. result.Select(c => c.Chunk)];
     }

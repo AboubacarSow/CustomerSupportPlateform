@@ -42,7 +42,7 @@ internal class OllamaChatCompletion : IChatCompletion
             var messages = _dbContext.ConversationMessages
                                         .AsNoTracking()
                                         .Where(m => m.SessionId == sessionId)
-                                        .OrderBy(c=>c.CreatedAt);
+                                        .OrderByDescending(c=>c.CreatedAt);
 
             usermessages = [.. messages.Where(m => m.Role == "user")
                 .Select(m => new Message(m.Role, m.Content))];

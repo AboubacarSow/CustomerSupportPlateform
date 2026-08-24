@@ -5,6 +5,7 @@ public interface ILocalStorage
 {
     void ClearDocumentFromTemp(string path);
     Task<string> UploadFileToTempAsync(IFormFile file, Language language);
+    bool IsFileAlreadyExists(string fileName, Language language);
 
 
 }

@@ -1,5 +1,3 @@
-using CustomerSupportPlateform.Domain.Entities;
-
 namespace CustomerSupportPlateform.Application.Interfaces;
 
 public interface IApplicationDbContext
@@ -13,4 +11,6 @@ public interface IApplicationDbContext
 
     void Add<TEntity>(TEntity entity) where TEntity : class;
     void Remove<TEntity>(TEntity entity) where TEntity : class;
+
+    void RemoveRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class;
 }

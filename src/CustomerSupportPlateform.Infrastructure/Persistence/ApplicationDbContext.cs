@@ -38,6 +38,11 @@ internal class ApplicationDbContext : IdentityDbContext<ApplicationUser,Applicat
         base.Remove<TEntity>(entity);
     }
 
+    public void RemoveRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+    {
+        base.RemoveRange(entities);
+    }
+
     internal DbSet<ConversationMessage> ConversationMessages => Set<ConversationMessage>();
     internal DbSet<Session> Sessions => Set<Session>();
     internal DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
