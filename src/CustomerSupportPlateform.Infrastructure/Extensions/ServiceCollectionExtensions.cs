@@ -5,6 +5,7 @@ using CustomerSupportPlateform.Infrastructure.Ingestions;
 using CustomerSupportPlateform.Infrastructure.Ingestions.ContentExtractors;
 using CustomerSupportPlateform.Infrastructure.Interceptors;
 using CustomerSupportPlateform.Infrastructure.Persistence;
+using CustomerSupportPlateform.Infrastructure.Policies;
 using CustomerSupportPlateform.Infrastructure.Processors;
 using CustomerSupportPlateform.Infrastructure.PromptPreparation;
 using CustomerSupportPlateform.Infrastructure.Storage;
@@ -41,13 +42,14 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IChatCompletion,OpenAiChatCompletion>();
 
         services.AddScoped<ISaveChangesInterceptor,DispatchDomainEventInterceptor>();
+
         services.AddHttpClient("Ollama-Client", client =>
         {
             var endpoint = configuration["Ollama:Endpoint"];
             ArgumentException.ThrowIfNullOrEmpty(endpoint);
             client.BaseAddress = new Uri(endpoint);
-            client.Timeout = TimeSpan.FromMinutes(30);
-        });
+            client.Timeout = TimeSpan.FromMinutes(10);
+        }).AddPolicyHandler(OllamaPolicy.ImmediatRetry);
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider,options) =>
         {

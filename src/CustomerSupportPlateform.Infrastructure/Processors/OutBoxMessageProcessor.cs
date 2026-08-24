@@ -15,10 +15,11 @@ public class OutBoxMessageProcessor(IServiceScopeFactory scopeFactory,ILogger<Ou
     private readonly ILogger<OutBoxMessageProcessor> _logger = logger;
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var scope = _scopeFactory.CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         while (!stoppingToken.IsCancellationRequested)
         {
+            using var scope = _scopeFactory.CreateAsyncScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             try
             {
 
@@ -57,7 +58,8 @@ public class OutBoxMessageProcessor(IServiceScopeFactory scopeFactory,ILogger<Ou
 
                 await dbContext.SaveChangesAsync(stoppingToken);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError("Error occurred while Processing OutboxMessage: {Message}", ex.Message);
                 continue;
