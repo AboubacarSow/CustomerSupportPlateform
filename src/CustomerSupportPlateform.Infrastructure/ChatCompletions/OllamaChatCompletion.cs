@@ -49,7 +49,9 @@ internal class OllamaChatCompletion : IChatCompletion
             assistantMessages = [.. messages.Where(m => m.Role == "assisant")
                 .Select(m=> new Message(m.Role,m.Content))];
         }
+        _dbContext.Add( ConversationMessage.CreateNew(sessionId,"user",question));
         usermessages.Add(new("user", question));
+        
         var requestMessages = new List<Message>()
         {
              new("system",systemContentWithContext!),

@@ -16,22 +16,36 @@ public class UploadDocumentValidator: AbstractValidator<UploadDocumentCommand>
         RuleFor(d => d.File).NotNull()
             .WithMessage("File is required");
 
+
         RuleFor(d=>d.Language).NotEmpty()
+            .IsInEnum()
             .WithMessage("Language is required");
     }
 }
 public class UploadDocumentHandler(ILocalStorage localStorage,
     IApplicationDbContext dbContext) : IRequestHandler<UploadDocumentCommand, (Guid, string, string, IndexStatus)>
 {
+
+    private readonly HashSet<string> _extensions = new(StringComparer.OrdinalIgnoreCase) 
+    { 
+        ".md", ".pdf", ".docx"
+    };
     public async ValueTask<(Guid, string, string, IndexStatus)> Handle(UploadDocumentCommand request, CancellationToken cancellationToken)
     {
+        var fileExtension = Path.GetExtension(request.File.FileName);
+        if (_extensions.Contains(fileExtension))
+        {
+            throw new FileUploadedExtensionException(string.Join(" ,", _extensions));
+        }
         using var stream = new MemoryStream();
         await request.File.CopyToAsync(stream, cancellationToken);
         
 
-        var isFileTheSameNameExist = localStorage.IsFileAlreadyExists(request.File.FileName,request.Language);
+        var isFileTheSameNameExist = localStorage.IsFileAlreadyExists(request.File.FileName,
+                                            request.Language);
 
-        var localStoragePath = await localStorage.UploadFileToTempAsync(request.File,request.Language);
+        var localStoragePath = await localStorage.UploadFileToTempAsync(request.File,
+                                            request.Language);
         
 
         if (isFileTheSameNameExist)

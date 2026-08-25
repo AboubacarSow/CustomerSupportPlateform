@@ -12,7 +12,6 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
         CancellationToken cancellationToken)
     {
-        //int statusCode;string exceptionMessage;
         if(exception != null)
         {
             logger.LogError("An Unhandled exception occured");
@@ -21,6 +20,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 ArgumentNullException => ((int)HttpStatusCode.BadRequest, exception.Message),
                 ValidationException => ((int)HttpStatusCode.BadRequest, exception.Message),
                 NotFoundException => ((int)HttpStatusCode.NotFound, exception.Message),
+                FileUploadedExtensionException=> ((int)HttpStatusCode.BadRequest, exception.Message),
                 _ => ((int)HttpStatusCode.InternalServerError, $"Something went wrong happen:{exception.Message}")
 
             };
