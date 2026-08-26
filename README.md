@@ -471,7 +471,7 @@ The current backend exposes four main application endpoints.
 | ------ | ---------------------- | ------------------ | -------------------------------------------------------------- |
 | `POST` | `/api/knowledges`      | Authenticated user | Upload and asynchronously ingest a knowledge document          |
 | `GET`  | `/api/knowledges/{id}` | Authenticated user | Retrieve a specific knowledge document and its indexing status |
-| `POST` | `/api/sessions`        | Authenticated user | Create a chat session                                          |
+| `POST` | `/api/sessions`        | public endpoint | Create a chat session                                          |
 | `POST` | `/api/chat`            | Public             | Submit a question and receive a generated answer               |
 
 ### `POST /api/knowledges`

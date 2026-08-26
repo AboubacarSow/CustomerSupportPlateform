@@ -13,7 +13,8 @@ public class GetDocumentByIdEndpoint : ICarterModule
             return Results.Ok(result);
         }).Produces<DocumentDto>((int)HttpStatusCode.OK)
         .WithDescription("Gets Knowledge Document Details")
-        .WithTags("Knowledges");
+        .WithTags("Knowledges")
+        .RequireAuthorization();
     }
 }
 

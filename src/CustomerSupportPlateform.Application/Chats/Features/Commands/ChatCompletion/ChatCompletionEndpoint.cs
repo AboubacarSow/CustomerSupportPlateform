@@ -1,3 +1,5 @@
+using CustomerSupportPlateform.Application.Chats.ActionFilters;
+
 namespace CustomerSupportPlateform.Application.Chats.Features.Commands.ChatCompletion;
 
 
@@ -9,9 +11,10 @@ public class ChatCompletionEndpoint : ICarterModule
     {
         app.MapPost("/api/chat", async (IMediator sender, ChatCompletionRequest request) =>
         {
-            var result = await sender.Send(new ChatCompletionCommand(request.SessionId,request.Question));
+            var result = await sender.Send(new ChatCompletionCommand(request.SessionId, request.Question));
 
             return Results.Ok(new ChatCompletionResponse(result.Message));
         }).WithTags("Chats");
+        
     }
 }
